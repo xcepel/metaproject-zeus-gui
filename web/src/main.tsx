@@ -8,6 +8,7 @@ import 'mantine-datatable/styles.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/tiptap/styles.css';
 import '@mantine/dates/styles.css';
+import './design-system.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 

@@ -1,0 +1,10 @@
+/* Mantine is unlayered, so it always beats the Carbon reset in `carbon`. */
+@layer carbon;
+
+@import '@metacentrum/design-system/tokens.css';
+@import '@metacentrum/design-system/foundation.css' layer(carbon);
+@import '@metacentrum/design-system/styles.css';
+
+.mc-header.cds--header {
+	z-index: 150;
+}

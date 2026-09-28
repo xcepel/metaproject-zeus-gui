@@ -5,6 +5,10 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react(), tsconfigPaths()],
+	resolve: {
+		// avoids a duplicate React copy from the linked design-system package
+		dedupe: ['react', 'react-dom']
+	},
 	server: {
 		host: '0.0.0.0',
 		hmr: {

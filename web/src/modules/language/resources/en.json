@@ -27,6 +27,9 @@
       },
       "navbar": {
         "header": "MetaProject Zeus",
+        "logout": "Log out",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu",
         "adminWarning": "You are now logged in as Administrator and have all permissions."
       },
       "errorPage": {

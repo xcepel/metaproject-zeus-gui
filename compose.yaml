@@ -9,6 +9,8 @@ services:
     volumes:
       - ./web/src:/app/src
       - ./web/public:/app/public
+      # local-only until @metacentrum/design-system is published
+      - ../../metacentrum-design:/app/node_modules/@metacentrum/design-system
     ports:
       - "5137:5137"
     environment:

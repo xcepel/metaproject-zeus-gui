@@ -34,7 +34,7 @@ const TextEditor = ({ inputHtmlName, label, description, placeholder, ...inputPr
 			{...form.register(inputHtmlName)}
 		>
 			<RichTextEditor {...inputProps} editor={editor} mt={10}>
-				<RichTextEditor.Toolbar sticky stickyOffset={60}>
+				<RichTextEditor.Toolbar sticky stickyOffset="var(--mc-header-height)">
 					<RichTextEditor.ControlsGroup>
 						<RichTextEditor.Bold />
 						<RichTextEditor.Italic />

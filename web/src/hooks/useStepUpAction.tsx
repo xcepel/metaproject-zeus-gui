@@ -1,29 +1,28 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Switch, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { type HeaderAction } from '@metacentrum/design-system';
 
 import { StepUpAccess } from '@/modules/auth/model';
 import { userStepDown } from '@/modules/auth/methods/userStepDown';
 import { userStepUp } from '@/modules/auth/methods/userStepUp';
 import { getMaxRole } from '@/modules/auth/methods/getMaxRole';
+import { getStepUpAccess } from '@/modules/auth/methods/getStepUpAccess';
 import { Role } from '@/modules/user/role';
 import { useAdminContext } from '@/modules/auth/admin-context';
+import SwitchIcon from '@/components/global/switch-icon';
 
-type StepUpToggleProps = {
-	stepUpAccess: StepUpAccess;
-};
-
-const StepUpToggle = ({ stepUpAccess }: StepUpToggleProps) => {
+const useStepUpAction = (): HeaderAction | undefined => {
 	const { setCurrentRole } = useAdminContext();
+	const stepUpAccess = getStepUpAccess();
 	const maxRole = getMaxRole();
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const [checked, setChecked] = useState(stepUpAccess === StepUpAccess.LOGGED);
 
-	const openModal = () => {
+	const toggle = () => {
 		if (checked) {
 			userStepDown();
 			setCurrentRole(Role.USER);
@@ -52,27 +51,15 @@ const StepUpToggle = ({ stepUpAccess }: StepUpToggleProps) => {
 	};
 
 	if (stepUpAccess === StepUpAccess.NONE || maxRole === Role.USER) {
-		return null;
+		return undefined;
 	}
 
-	return (
-		<Box>
-			<Tooltip
-				refProp="rootRef"
-				label={t(`components.global.stepUpToggle.${maxRole}.switchDescription`)}
-				zIndex={600}
-			>
-				<Switch
-					color={maxRole === Role.ADMIN ? 'yellow' : 'lime'}
-					checked={checked}
-					onChange={openModal}
-					size="md"
-					onLabel={t(`components.global.stepUpToggle.${maxRole}.switchLabel`)}
-					offLabel={t(`components.global.stepUpToggle.${maxRole}.switchLabel`)}
-				/>
-			</Tooltip>
-		</Box>
-	);
+	return {
+		label: t(`components.global.stepUpToggle.${maxRole}.switchDescription`),
+		icon: <SwitchIcon checked={checked} />,
+		onClick: toggle,
+		active: checked
+	};
 };
 
-export default StepUpToggle;
+export default useStepUpAction;

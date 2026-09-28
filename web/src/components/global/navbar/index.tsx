@@ -1,87 +1,207 @@
+import { type AnchorHTMLAttributes, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PropsWithChildren, useEffect, useState } from 'react';
-import { Anchor, Box, Burger, Flex, getBreakpointValue, Group, Image, Tooltip, useMantineTheme } from '@mantine/core';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
+import {
+	IconActivity,
+	IconArchive,
+	IconBan,
+	IconClockQuestion,
+	IconCpu,
+	IconDeviceDesktopAnalytics,
+	IconDevices2,
+	IconLibrary,
+	IconPodium,
+	IconQuestionMark,
+	IconReport,
+	IconUserUp
+} from '@tabler/icons-react';
+import { Header, type HeaderNavItem } from '@metacentrum/design-system';
 
-import useWindowSize from '@/hooks/useWindowSize';
-import { getStepUpAccess } from '@/modules/auth/methods/getStepUpAccess';
-import StepUpToggle from '@/components/global/step-up-toggle';
-import DrawerList from '@/components/global/navbar/drawer-list';
+import { useAdminContext } from '@/modules/auth/admin-context';
+import { IS_USER_STEP_UP, MAX_ROLE } from '@/modules/auth/constants';
+import { Role } from '@/modules/user/role';
+import useStepUpAction from '@/hooks/useStepUpAction';
 
-import classes from './navbar.module.css';
-import UserMenu from './user-menu';
+const RouterLink = forwardRef<HTMLAnchorElement, { href: string } & AnchorHTMLAttributes<HTMLAnchorElement>>(
+	({ href, ...rest }, ref) => <Link ref={ref} to={href} {...rest} />
+);
+RouterLink.displayName = 'RouterLink';
 
-const DEFAULT_OPENED = 'defaultMenuOpened';
-const OPEN_WINDOW_SIZE = 1200;
+type LinkNode = {
+	title: string;
+	href: string;
+	icon: React.ReactNode;
+	links?: LinkNode[];
+};
 
-const shouldOpenByDefault = (windowSize: number) =>
-	windowSize > OPEN_WINDOW_SIZE &&
-	(localStorage.getItem(DEFAULT_OPENED) === null || localStorage.getItem(DEFAULT_OPENED) === 'true');
+const ICON_SIZE = 18;
 
-const Navbar = ({ children }: PropsWithChildren) => {
-	const theme = useMantineTheme();
+const projectLinks: LinkNode = {
+	title: 'components.global.drawerList.links.projects.title',
+	href: '/project',
+	icon: <IconReport size={ICON_SIZE} />,
+	links: [
+		{
+			title: 'components.global.drawerList.links.projects.active',
+			href: '/project?status=active',
+			icon: <IconActivity size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.projects.requested',
+			href: '/project?status=requested',
+			icon: <IconClockQuestion size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.projects.archived',
+			href: '/project?status=archived',
+			icon: <IconArchive size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.projects.rejected',
+			href: '/project?status=rejected',
+			icon: <IconBan size={ICON_SIZE} />
+		}
+	]
+};
+
+const publicationsLink: LinkNode = {
+	title: 'components.global.drawerList.links.publications.title',
+	href: '/publications',
+	icon: <IconLibrary size={ICON_SIZE} />
+};
+
+const adminLinks: LinkNode = {
+	title: 'components.global.drawerList.links.admin.title',
+	href: '/admin',
+	icon: <IconUserUp size={ICON_SIZE} />,
+	links: [
+		{
+			title: 'components.global.drawerList.links.admin.link.allocations',
+			href: '/admin/allocations',
+			icon: <IconCpu size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.admin.link.projects',
+			href: '/admin/projects',
+			icon: <IconReport size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.admin.link.resources',
+			href: '/admin/resources',
+			icon: <IconDevices2 size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.admin.link.requests',
+			href: '/admin/requests',
+			icon: <IconQuestionMark size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.admin.link.allocation_requests',
+			href: '/admin/allocation-requests',
+			icon: <IconDeviceDesktopAnalytics size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.admin.link.stages',
+			href: '/admin/stages',
+			icon: <IconPodium size={ICON_SIZE} />
+		}
+	]
+};
+
+const directorLinks: LinkNode = {
+	title: 'components.global.drawerList.links.director.title',
+	href: '/director',
+	icon: <IconUserUp size={ICON_SIZE} />,
+	links: [
+		{
+			title: 'components.global.drawerList.links.director.link.allocations',
+			href: '/director/allocations',
+			icon: <IconCpu size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.director.link.projects',
+			href: '/director/projects',
+			icon: <IconReport size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.director.link.resources',
+			href: '/director/resources',
+			icon: <IconDevices2 size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.director.link.requests',
+			href: '/director/requests',
+			icon: <IconQuestionMark size={ICON_SIZE} />
+		},
+		{
+			title: 'components.global.drawerList.links.director.link.allocation_requests',
+			href: '/director/allocation-requests',
+			icon: <IconDeviceDesktopAnalytics size={ICON_SIZE} />
+		}
+	]
+};
+
+const Navbar = () => {
 	const { t } = useTranslation();
-	const { isAuthenticated } = useAuth();
-	const windowSize = useWindowSize();
-	const stepUpAccess = getStepUpAccess();
-	const [drawerOpened, setDrawerOpened] = useState<boolean>(shouldOpenByDefault(windowSize));
+	const navigate = useNavigate();
+	const { pathname, search } = useLocation();
+	const { isAuthenticated, user, removeUser, revokeTokens } = useAuth();
+	const { currentRole } = useAdminContext();
+	const stepUpAction = useStepUpAction();
 
-	const toggleDrawer = (opened: boolean) => {
-		localStorage.setItem(DEFAULT_OPENED, opened ? 'true' : 'false');
-		setDrawerOpened(opened);
+	const isChildActive = (href: string) =>
+		href.includes('?') ? `${pathname}${search}` === href : pathname.startsWith(href);
+
+	const toNavItem = ({ title, href, icon, links }: LinkNode): HeaderNavItem => ({
+		label: t(title),
+		icon,
+		href: links ? undefined : href,
+		active: pathname.startsWith(href),
+		children: links?.map(link => ({
+			label: t(link.title),
+			href: link.href,
+			icon: link.icon,
+			active: isChildActive(link.href)
+		}))
+	});
+
+	const links: LinkNode[] = [projectLinks, publicationsLink];
+	if (currentRole === Role.ADMIN) {
+		links.push(adminLinks);
+	}
+	if (currentRole === Role.DIRECTOR) {
+		links.push(directorLinks);
+	}
+
+	const logout = async () => {
+		localStorage.removeItem(MAX_ROLE);
+		localStorage.removeItem(IS_USER_STEP_UP);
+		await removeUser();
+		await revokeTokens();
+		navigate('/');
 	};
 
-	useEffect(() => {
-		setDrawerOpened(shouldOpenByDefault(windowSize));
-	}, [windowSize]);
-
 	return (
-		<>
-			<Flex justify="space-between" align="center" className={classes.wrapper}>
-				<Box component="header" color="white">
-					<Group h="100%" pl={10}>
-						{isAuthenticated && (
-							<Group>
-								<Tooltip label="Menu" zIndex={600}>
-									<Burger size="sm" color="white" onClick={() => toggleDrawer(!drawerOpened)} />
-								</Tooltip>
-							</Group>
-						)}
-						<Group>
-							<Image
-								src="/images/zeus.png"
-								w={30}
-								style={{
-									filter: 'invert(100%)'
-								}}
-							/>
-							<Anchor component={Link} to="/" c="white" underline="never" visibleFrom="sm">
-								{t('components.global.navbar.header')}
-							</Anchor>
-						</Group>
-					</Group>
-				</Box>
-				{isAuthenticated && (
-					<Group mr={10} gap={1}>
-						<StepUpToggle stepUpAccess={stepUpAccess} />
-						<UserMenu isOpened={drawerOpened} />
-					</Group>
-				)}
-			</Flex>
-			<Flex justify="center">
-				{isAuthenticated && <DrawerList open={drawerOpened} onClose={() => toggleDrawer(false)} />}
-				<Box
-					w={
-						drawerOpened && windowSize > getBreakpointValue(theme.breakpoints.md, theme.breakpoints)
-							? `calc(100% - 300px)`
-							: `100%`
-					}
-				>
-					{children}
-				</Box>
-			</Flex>
-		</>
+		<Header
+			title={t('components.global.navbar.header')}
+			logo={<img className="mc-header__logo" src="/images/zeus.png" alt="" />}
+			linkAs={RouterLink}
+			navItems={isAuthenticated ? links.map(toNavItem) : []}
+			actions={stepUpAction ? [stepUpAction] : []}
+			user={
+				user
+					? {
+							firstName: user.profile.given_name ?? user.profile.name ?? '',
+							lastName: user.profile.family_name ?? ''
+						}
+					: undefined
+			}
+			onLogout={user ? logout : undefined}
+			logoutLabel={t('components.global.navbar.logout')}
+			openMenuLabel={t('components.global.navbar.openMenu')}
+			closeMenuLabel={t('components.global.navbar.closeMenu')}
+		/>
 	);
 };
 
