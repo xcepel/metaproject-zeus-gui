@@ -4,6 +4,7 @@ import { createTheme, MantineProvider } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModalsProvider } from '@mantine/modals';
 import { AuthProvider } from 'react-oidc-context';
+import { mantineTheme } from '@metacentrum/design-system/mantine-theme';
 
 import Project from '@/routes/project';
 import AddProject from '@/routes/project/add';
@@ -44,7 +45,7 @@ import ErrorPage from './components/global/error-page';
 import ResourceList from './routes/admin/resources/list';
 import ResourceAttributesPage from './routes/admin/resources/attributes';
 
-// Create QueryClient outside component to prevent recreation on re-renders
+// Create QueryClient outside component -> prevent recreation on re-renders
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
@@ -54,7 +55,7 @@ const queryClient = new QueryClient({
 	}
 });
 
-// Create router outside component to prevent recreation on re-renders
+// Create router outside component -> prevent recreation on re-renders
 const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route id="root" path="/" element={<Root />} errorElement={<ErrorPage />}>
@@ -118,24 +119,9 @@ const router = createBrowserRouter(
 
 const App = () => {
 	const theme = createTheme({
-		primaryShade: 7,
-		primaryColor: 'sky',
+		...mantineTheme,
 		// autoContrast: true,
-		cursorType: 'pointer',
-		colors: {
-			sky: [
-				'#ebf6ff',
-				'#d5e9fa',
-				'#a5d1f7',
-				'#73b9f6',
-				'#50a4f5',
-				'#3d97f5',
-				'#3491f6',
-				'#297ddb',
-				'#1d6fc4',
-				'#0060ad'
-			]
-		}
+		cursorType: 'pointer'
 	});
 
 	const router = createBrowserRouter(

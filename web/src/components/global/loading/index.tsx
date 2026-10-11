@@ -9,7 +9,7 @@ type LoadingProps = {
 const Loading = ({ text }: LoadingProps) => (
 	<MainContentWrapper>
 		<Stack align="center" py={rem(150)}>
-			<Loader color="sky" size={rem(40)} />
+			<Loader size={rem(40)} />
 			{text && <Text>{text}</Text>}
 		</Stack>
 	</MainContentWrapper>
