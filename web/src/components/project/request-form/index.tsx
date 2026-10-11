@@ -1,7 +1,8 @@
-import { Button, Flex, TextInput } from '@mantine/core';
+import { Flex, TextInput } from '@mantine/core';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IconSend } from '@tabler/icons-react';
+import { Button } from '@metacentrum/design-system';
 
 import TextEditor from '@/components/global/text-editor';
 import { type RequestProjectSchema } from '@/modules/project/form';
@@ -40,12 +41,10 @@ const RequestForm = ({ loading, onSubmit, submitText }: RequestFormProps) => {
 			<Flex justify="center">
 				<Button
 					loading={loading}
-					leftSection={<IconSend />}
+					icon={<IconSend />}
 					type="submit"
-					variant="filled"
-					color="teal"
-					mt={10}
-					w={200}
+					variant="primary"
+					style={{ marginTop: 10, width: 200 }}
 				>
 					{submitText}
 				</Button>

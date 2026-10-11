@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Button, Checkbox, Divider, Group, NumberInput, Stack, TextInput, Title } from '@mantine/core';
+import { ActionIcon, Box, Checkbox, Divider, Group, NumberInput, Stack, TextInput, Title } from '@mantine/core';
 import { IconClipboardPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
@@ -9,7 +9,7 @@ import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { HTTPError } from 'ky';
-import { DataTable, type DataTableSort } from '@metacentrum/design-system';
+import { Button, DataTable, type DataTableSort } from '@metacentrum/design-system';
 
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import { useProjectOutletContext } from '@/modules/auth/guards/project-detail-guard';
@@ -65,7 +65,7 @@ const ProjectPublicationsAddPage = () => {
 	const myRecords = myResponse?.data ?? [];
 	const myTotal = myResponse?.metadata?.totalRecords ?? 0;
 	const [selectedMy, setSelectedMy] = useState<Publication[]>([]);
-	// DataTable has no row selection, so selection is a checkbox column (matched by id).
+	// DataTable has no row selection; use a checkbox column.
 	const isMySelected = (publication: Publication) => selectedMy.some(selected => selected.id === publication.id);
 	const toggleMySelected = (publication: Publication) =>
 		setSelectedMy(selected =>
@@ -172,7 +172,7 @@ const ProjectPublicationsAddPage = () => {
 						error={addPublicationManuallyForm.formState.errors.journal?.message}
 					/>
 					<Group mt={15} justify="center">
-						<Button type="submit">{t('routes.ProjectPublicationsAddPage.modal.form.submit')}</Button>
+						<Button variant="primary" type="submit">{t('routes.ProjectPublicationsAddPage.modal.form.submit')}</Button>
 					</Group>
 				</form>
 			)
@@ -276,7 +276,7 @@ const ProjectPublicationsAddPage = () => {
 							error={searchDoiForm.formState.errors.doi?.message}
 							{...searchDoiForm.register('doi')}
 						/>
-						<Button fullWidth type="submit" leftSection={<IconSearch />} loading={isSearching}>
+						<Button variant="primary" fullWidth type="submit" icon={<IconSearch />} loading={isSearching}>
 							{t('routes.ProjectPublicationsAddPage.search_by_doi')}
 						</Button>
 					</Stack>
@@ -284,13 +284,12 @@ const ProjectPublicationsAddPage = () => {
 				<Divider label="or" />
 				<Button
 					onClick={openManualPublicationAdd}
-					variant="outline"
-					color="teal"
-					leftSection={<IconClipboardPlus />}
+					variant="secondary"
+					icon={<IconClipboardPlus />}
 				>
 					{t('routes.ProjectPublicationsAddPage.add_manually')}
 				</Button>
-				<Button onClick={openAddFromMy} variant="outline" color="blue">
+				<Button onClick={openAddFromMy} variant="secondary">
 					{t('routes.ProjectPublicationsAddPage.add_from_my_publications')}
 				</Button>
 			</Stack>
@@ -333,7 +332,7 @@ const ProjectPublicationsAddPage = () => {
 							}
 						]}
 					/>
-					<Button onClick={addPublications} color="teal" fullWidth mt={10} loading={isPending}>
+					<Button onClick={addPublications} variant="primary" fullWidth style={{ marginTop: 10 }} loading={isPending}>
 						{publications.length === 1
 							? t('routes.ProjectPublicationsAddPage.add_button_one', { count: 1, defaultValue: 'Add publication to project' })
 							: t('routes.ProjectPublicationsAddPage.add_button_other', { count: publications.length, defaultValue: 'Add publications to project' })}
@@ -386,8 +385,8 @@ const ProjectPublicationsAddPage = () => {
 						]}
 					/>
 					<Group mt={10} justify="flex-end">
-						<Button variant="default" onClick={closeAddFromMy}>{t('common.cancel', { defaultValue: 'Cancel' })}</Button>
-						<Button color="teal" onClick={assignSelectedFromMy} loading={assignMutation.isPending}>
+						<Button variant="secondary" onClick={closeAddFromMy}>{t('common.cancel', { defaultValue: 'Cancel' })}</Button>
+						<Button variant="primary" onClick={assignSelectedFromMy} loading={assignMutation.isPending}>
 							{t('routes.ProjectPublicationsAddPage.my.assign_selected', { defaultValue: 'Assign selected' })}
 						</Button>
 					</Group>

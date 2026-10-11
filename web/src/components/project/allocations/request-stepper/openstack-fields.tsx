@@ -1,7 +1,8 @@
-import { Button, Fieldset, Group, MultiSelect, NumberInput, Select, SegmentedControl, Stack, TagsInput, Text, Textarea, TextInput, Tooltip } from '@mantine/core';
+import { Fieldset, Group, MultiSelect, NumberInput, Select, SegmentedControl, Stack, TagsInput, Text, Textarea, TextInput, Tooltip } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { Controller, type ControllerRenderProps, type FieldArrayWithId, useFieldArray, useFormContext } from 'react-hook-form';
 import { useEffect, useMemo, useState } from 'react';
+import { Button } from '@metacentrum/design-system';
 
 import { type AddAllocationSchema, type OpenstackQuotaEntry, type OpenstackNetworkEntry } from '@/modules/allocation/form';
 import {
@@ -385,8 +386,8 @@ const OpenstackAllocationFields = () => {
 								/>
 								<Button
 									type="button"
-									variant="subtle"
-									size="xs"
+									variant="ghost"
+									size="sm"
 									onClick={() => remove(index)}
 									disabled={fields.length === 1}
 								>
@@ -396,8 +397,8 @@ const OpenstackAllocationFields = () => {
 						))}
 						<Button
 							type="button"
-							variant="light"
-							size="xs"
+							variant="secondary"
+							size="sm"
 							onClick={() => append({ key: '', value: 0 } as OpenstackQuotaEntry)}
 							disabled={quotaOptions.length > 0 && fields.length >= quotaOptions.length}
 						>
@@ -530,8 +531,8 @@ const OpenstackAllocationFields = () => {
 									/>
 									<Button
 										type="button"
-										variant="subtle"
-										size="xs"
+										variant="ghost"
+										size="sm"
 										onClick={() => removeNetwork(index)}
 									>
 										Remove
@@ -541,8 +542,8 @@ const OpenstackAllocationFields = () => {
 						})}
 						<Button
 							type="button"
-							variant="light"
-							size="xs"
+							variant="secondary"
+							size="sm"
 							onClick={() => appendNetwork({ name: '', accessType: 'external' } as OpenstackNetworkEntry)}
 							disabled={networkOptions.length === 0}
 						>

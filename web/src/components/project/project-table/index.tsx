@@ -23,7 +23,7 @@ const ProjectTable = ({ status, title }: ProjectTableProps) => {
 
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	// The query key includes page/limit/sort, so changing state refetches on its own.
+	// Query key includes page/limit/sort, so state changes refetch.
 	const {
 		data: response,
 		isPending,

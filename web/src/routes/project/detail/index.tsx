@@ -3,14 +3,12 @@ import {
 	Alert,
 	Badge,
 	Box,
-	Button,
 	Group,
 	Loader,
 	rem,
 	Select,
 	SimpleGrid,
 	Stack,
-	Tabs,
 	Text,
 	Title,
 	Tooltip
@@ -19,7 +17,7 @@ import { IconArchive, IconBan, IconInfoCircle, IconRepeat } from '@tabler/icons-
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { PageHeader } from '@metacentrum/design-system';
+import { Button, PageHeader, Tabs } from '@metacentrum/design-system';
 
 import ProjectMembers from '@/components/project/members';
 import RouterLink from '@/components/global/router-link';
@@ -69,6 +67,10 @@ const ProjectDetail = () => {
 		project.status === ProjectStatus.REJECTED &&
 		permissions.includes('view_advanced_details') &&
 		!!rejectedComments;
+
+	const [activeTab, setActiveTab] = useState<string>(
+		showArchivalInfoTab ? 'archivalInfo' : showRejectedInfoTab ? 'rejectedComments' : 'projectInfo'
+	);
 
 	return (
 		<Box>
@@ -128,188 +130,210 @@ const ProjectDetail = () => {
 			)}
 			<ProjectInfo project={project} showFullDescription={false} />
 
-			<Tabs
-				py={20}
-				defaultValue={
-					showArchivalInfoTab ? 'archivalInfo' : showRejectedInfoTab ? 'rejectedComments' : 'projectInfo'
-				}
-			>
-				<Tabs.List>
-					{showArchivalInfoTab && (
-						<Tabs.Tab value="archivalInfo" leftSection={<IconArchive style={iconStyle} />}>
-							Archival info
-						</Tabs.Tab>
-					)}
-					{showRejectedInfoTab && (
-						<Tabs.Tab value="rejectedComments" leftSection={<IconBan style={iconStyle} />}>
-							Reasons for rejection
-						</Tabs.Tab>
-					)}
-					<Tabs.Tab value="projectInfo" leftSection={<IconInfoCircle style={iconStyle} />}>
-						Project info
-					</Tabs.Tab>
-					<Tabs.Tab value="resourceUsage" leftSection={<IconInfoCircle style={iconStyle} />}>
-						Resource usage
-					</Tabs.Tab>
-				</Tabs.List>
+			<Box py={20}>
+				<Tabs
+					aria-label="Project detail"
+					selected={activeTab}
+					onChange={setActiveTab}
+					tabs={[
+						...(showArchivalInfoTab
+							? [
+									{
+										id: 'archivalInfo',
+										label: 'Archival info',
+										icon: <IconArchive style={iconStyle} />,
+										content: (
+											<>
+												<Stack mt={20}>
+													<Box>
+														<Title order={4}>Archival description:</Title>
+														<Text>{archivalInfo.description}</Text>
+													</Box>
 
-				{showArchivalInfoTab && (
-					<Tabs.Panel value="archivalInfo">
-						<Stack mt={20}>
-							<Box>
-								<Title order={4}>Archival description:</Title>
-								<Text>{archivalInfo.description}</Text>
-							</Box>
+													{archivalInfo.file && (
+														<Box mb={40} mt={15}>
+															<Title order={4}>Attached file:</Title>
+															<FileView
+																downloadType="archival"
+																file={archivalInfo.file}
+															/>
+														</Box>
+													)}
+												</Stack>
+											</>
+										)
+									}
+								]
+							: []),
+						...(showRejectedInfoTab
+							? [
+									{
+										id: 'rejectedComments',
+										label: 'Reasons for rejection',
+										icon: <IconBan style={iconStyle} />,
+										content: (
+											<>
+												<CommentsTimeline rejectedComments={rejectedComments} />
+												<Button href="request" linkAs={RouterLink} icon={<IconRepeat />}>
+													{t('routes.ProjectDetail.rejectedComments.request')}
+												</Button>
+											</>
+										)
+									}
+								]
+							: []),
+						{
+							id: 'projectInfo',
+							label: 'Project info',
+							icon: <IconInfoCircle style={iconStyle} />,
+							content: (
+								<>
+									<ProjectAllocationsTable id={project.id} />
+									{project.status === ProjectStatus.ACTIVE && (
+										<>
+											<ProjectMembers id={project.id} />
+											<ProjectPublications id={project.id} />
+										</>
+									)}
+								</>
+							)
+						},
+						{
+							id: 'resourceUsage',
+							label: 'Resource usage',
+							icon: <IconInfoCircle style={iconStyle} />,
+							content: (
+								<>
+									{isLoadingUsage && (
+										<Group justify="center" py="xl">
+											<Loader size="lg" />
+										</Group>
+									)}
 
-							{archivalInfo.file && (
-								<Box mb={40} mt={15}>
-									<Title order={4}>Attached file:</Title>
-									<FileView downloadType="archival" file={archivalInfo.file} />
-								</Box>
-							)}
-						</Stack>
-					</Tabs.Panel>
-				)}
+									{!isLoadingUsage && usageData && (
+										<Stack gap="md">
+											<Group>
+												{initialSources.length > 1 && (
+													<Select
+														label="Data source"
+														placeholder="All sources"
+														data={[
+															{ value: '', label: 'All sources' },
+															...initialSources.map((source: string) => ({
+																value: source,
+																label: source.toUpperCase()
+															}))
+														]}
+														value={selectedSource}
+														onChange={(value: string | null) =>
+															setSelectedSource(value || null)
+														}
+														clearable
+														style={{ minWidth: 200 }}
+													/>
+												)}
 
-				{showRejectedInfoTab && (
-					<Tabs.Panel value="rejectedComments">
-						<CommentsTimeline rejectedComments={rejectedComments} />
-						<Button component={Link} to="request" leftSection={<IconRepeat />}>
-							{t('routes.ProjectDetail.rejectedComments.request')}
-						</Button>
-					</Tabs.Panel>
-				)}
+												{usageData.availableAllocations &&
+													usageData.availableAllocations.length > 0 && (
+														<Select
+															label="Allocation / Job"
+															placeholder="All allocations"
+															data={[
+																{ value: 'all', label: 'All' },
+																...usageData.availableAllocations.map(
+																	(alloc: ResourceUsageAllocationOption) => ({
+																		value: alloc.id,
+																		label: alloc.label
+																	})
+																)
+															]}
+															value={selectedAllocation}
+															onChange={(value: string | null) =>
+																setSelectedAllocation(value || 'all')
+															}
+															clearable
+															style={{ minWidth: 250 }}
+														/>
+													)}
+											</Group>
 
-				<Tabs.Panel value="projectInfo">
-					<ProjectAllocationsTable id={project.id} />
-					{project.status === ProjectStatus.ACTIVE && (
-						<>
-							<ProjectMembers id={project.id} />
-							<ProjectPublications id={project.id} />
-						</>
-					)}
-				</Tabs.Panel>
+											{/* Static Metrics */}
+											<StaticMetricsCard
+												totalVcpus={usageData.totals.totalVcpus}
+												storageBytesAllocated={usageData.totals.storageBytesAllocated}
+												lastUpdated={usageData.totals.lastUpdated}
+											/>
 
-				<Tabs.Panel value="resourceUsage">
-					{isLoadingUsage && (
-						<Group justify="center" py="xl">
-							<Loader size="lg" />
-						</Group>
-					)}
+											<SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+												<UsageChartCard
+													title="CPU time"
+													description="Total CPU seconds consumed per window"
+													series={usageData.series}
+													unitType="time"
+													metrics={[
+														{
+															key: 'cpuTimeSeconds',
+															label: 'CPU time'
+														}
+													]}
+												/>
+												<UsageChartCard
+													title="CPU usage"
+													description="Average CPU utilization percentage"
+													series={usageData.series}
+													unitType="percentage"
+													metrics={[
+														{
+															key: 'cpuPercent',
+															label: 'CPU %'
+														}
+													]}
+												/>
+												{!isOpenstackOnly && (
+													<UsageChartCard
+														title="Walltime"
+														description="Elapsed time per window"
+														series={usageData.series}
+														unitType="time"
+														metrics={[
+															{
+																key: 'walltimeSeconds',
+																label: 'Walltime'
+															}
+														]}
+													/>
+												)}
+												<UsageChartCard
+													title="Memory"
+													description="Allocated vs used RAM"
+													series={usageData.series}
+													unitType="memory"
+													metrics={[
+														{
+															key: 'ramBytesAllocated',
+															label: 'Allocated'
+														},
+														{
+															key: 'ramBytesUsed',
+															label: 'Used'
+														}
+													]}
+												/>
+											</SimpleGrid>
+										</Stack>
+									)}
 
-					{!isLoadingUsage && usageData && (
-						<Stack gap="md">
-							<Group>
-								{initialSources.length > 1 && (
-									<Select
-										label="Data source"
-										placeholder="All sources"
-										data={[
-											{ value: '', label: 'All sources' },
-											...initialSources.map((source: string) => ({
-												value: source,
-												label: source.toUpperCase()
-											}))
-										]}
-										value={selectedSource}
-										onChange={(value: string | null) => setSelectedSource(value || null)}
-										clearable
-										style={{ minWidth: 200 }}
-									/>
-								)}
-
-								{usageData.availableAllocations && usageData.availableAllocations.length > 0 && (
-									<Select
-										label="Allocation / Job"
-										placeholder="All allocations"
-										data={[
-											{ value: 'all', label: 'All' },
-											...usageData.availableAllocations.map((alloc: ResourceUsageAllocationOption) => ({
-												value: alloc.id,
-												label: alloc.label
-											}))
-										]}
-										value={selectedAllocation}
-										onChange={(value: string | null) => setSelectedAllocation(value || 'all')}
-										clearable
-										style={{ minWidth: 250 }}
-									/>
-								)}
-							</Group>
-
-							{/* Static Metrics */}
-							<StaticMetricsCard
-								totalVcpus={usageData.totals.totalVcpus}
-								storageBytesAllocated={usageData.totals.storageBytesAllocated}
-								lastUpdated={usageData.totals.lastUpdated}
-							/>
-
-							<SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-								<UsageChartCard
-									title="CPU time"
-									description="Total CPU seconds consumed per window"
-									series={usageData.series}
-									unitType="time"
-									metrics={[
-										{
-											key: 'cpuTimeSeconds',
-											label: 'CPU time'
-										}
-									]}
-								/>
-								<UsageChartCard
-									title="CPU usage"
-									description="Average CPU utilization percentage"
-									series={usageData.series}
-									unitType="percentage"
-									metrics={[
-										{
-											key: 'cpuPercent',
-											label: 'CPU %'
-										}
-									]}
-								/>
-								{!isOpenstackOnly && (
-									<UsageChartCard
-										title="Walltime"
-										description="Elapsed time per window"
-										series={usageData.series}
-										unitType="time"
-										metrics={[
-											{
-												key: 'walltimeSeconds',
-												label: 'Walltime'
-											}
-										]}
-									/>
-								)}
-								<UsageChartCard
-									title="Memory"
-									description="Allocated vs used RAM"
-									series={usageData.series}
-									unitType="memory"
-									metrics={[
-										{
-											key: 'ramBytesAllocated',
-											label: 'Allocated'
-										},
-										{
-											key: 'ramBytesUsed',
-											label: 'Used'
-										}
-									]}
-								/>
-							</SimpleGrid>
-						</Stack>
-					)}
-
-					{!isLoadingUsage && !usageData && (
-						<Box py="xl">
-							<Text>No usage data available for this project yet.</Text>
-						</Box>
-					)}
-				</Tabs.Panel>
-			</Tabs>
+									{!isLoadingUsage && !usageData && (
+										<Box py="xl">
+											<Text>No usage data available for this project yet.</Text>
+										</Box>
+									)}
+								</>
+							)
+						}
+					]}
+				/>
+			</Box>
 		</Box>
 	);
 };

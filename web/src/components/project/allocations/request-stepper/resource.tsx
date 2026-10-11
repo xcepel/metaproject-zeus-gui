@@ -1,7 +1,8 @@
-import { Box, Button, Fieldset, Group, NumberInput, Select, Stack, Text, Textarea } from '@mantine/core';
+import { Box, Fieldset, Group, NumberInput, Select, Stack, Text, Textarea } from '@mantine/core';
 import { Controller, type ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
+import { Button } from '@metacentrum/design-system';
 
 import Loading from '@/components/global/loading';
 import ErrorAlert from '@/components/global/error-alert';
@@ -165,7 +166,7 @@ const ResourceStep = ({ resources, setSelectedResourceId, selectedResourceId, is
 				/>
 			)}
 			{isOpenstackResource && <OpenstackAllocationFields />}
-			<Button type="submit" loading={isPending}>
+			<Button variant="primary" type="submit" loading={isPending}>
 				Request resource allocation
 			</Button>
 		</Stack>

@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Flex, ThemeIcon, Title } from '@mantine/core';
+import { Box, Flex, ThemeIcon, Title } from '@mantine/core';
 import { IconLock } from '@tabler/icons-react';
 import { useAuth } from 'react-oidc-context';
+import { Button } from '@metacentrum/design-system';
 
 import Loading from '@/components/global/loading';
 
@@ -29,7 +30,7 @@ const Index: React.FC = () => {
 			</ThemeIcon>
 			<Title order={2}>{t('routes.index.title')}</Title>
 			<Box>
-				<Button variant="outline" mt={20} w={300} onClick={() => signinRedirect()}>
+				<Button variant="primary" style={{ marginTop: 20, width: 300 }} onClick={() => signinRedirect()}>
 					{t('routes.index.buttons.MUNI')}
 				</Button>
 			</Box>

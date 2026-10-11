@@ -1,4 +1,4 @@
-import { Box, Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core';
+import { Box, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -6,7 +6,7 @@ import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
 import { IconLibrary } from '@tabler/icons-react';
 import { HTTPError } from 'ky';
-import { DataTable, type DataTableSort, PageHeader } from '@metacentrum/design-system';
+import { Button, DataTable, type DataTableSort, PageHeader } from '@metacentrum/design-system';
 
 import RouterLink from '@/components/global/router-link';
 import { PUBLICATION_PAGE_SIZES } from '@/modules/publication/constants';
@@ -207,8 +207,8 @@ const MyPublicationsPage = () => {
                     />
                     <TextInput label="Journal" {...addForm.register('journal')} error={addForm.formState.errors.journal?.message} withAsterisk />
                     <Group mt={15} justify="flex-end">
-                        <Button variant="default" type="button" onClick={closeAddModal}>Cancel</Button>
-                        <Button type="submit" loading={addForm.formState.isSubmitting}>Add publication</Button>
+                        <Button variant="secondary" type="button" onClick={closeAddModal}>Cancel</Button>
+                        <Button variant="primary" type="submit" loading={addForm.formState.isSubmitting}>Add publication</Button>
                     </Group>
                 </form>
             </Modal>
@@ -223,8 +223,8 @@ const MyPublicationsPage = () => {
                         required
                     />
                     <Group mt={15} justify="flex-end">
-                        <Button variant="default" type="button" onClick={closeAddDoiModal}>Cancel</Button>
-                        <Button type="submit" loading={isDoiSubmitting}>Add by DOI</Button>
+                        <Button variant="secondary" type="button" onClick={closeAddDoiModal}>Cancel</Button>
+                        <Button variant="primary" type="submit" loading={isDoiSubmitting}>Add by DOI</Button>
                     </Group>
                 </form>
             </Modal>
@@ -251,10 +251,11 @@ const MyPublicationsPage = () => {
                             />
                         )}
                         <Group justify="flex-end">
-                            <Button variant="default" type="button" onClick={closeAssignModal}>Cancel</Button>
-                            <Button 
-                                type="submit" 
-                                loading={assignMutation.isPending} 
+                            <Button variant="secondary" type="button" onClick={closeAssignModal}>Cancel</Button>
+                            <Button
+                                variant="primary"
+                                type="submit"
+                                loading={assignMutation.isPending}
                                 disabled={!assignProjectId || projectOptions.length === 0}
                             >
                                 Assign
@@ -270,8 +271,8 @@ const MyPublicationsPage = () => {
                 linkAs={RouterLink}
                 actions={
                     <>
-                        <Button color="teal" onClick={openAddModal}>Add publication manually</Button>
-                        <Button color="blue" onClick={openAddDoiModal}>Add by DOI</Button>
+                        <Button variant="secondary" onClick={openAddModal}>Add publication manually</Button>
+                        <Button variant="primary" onClick={openAddDoiModal}>Add by DOI</Button>
                     </>
                 }
             />
@@ -301,8 +302,8 @@ const MyPublicationsPage = () => {
                         key: 'actions', header: '', width: '220px', align: 'end',
                         render: (pub: Publication) => (
                             <Group gap={8} justify="flex-end">
-                                <Button size="xs" variant="light" onClick={() => openAssignModal(pub)}>Assign to project</Button>
-                                <Button size="xs" color="red" variant="light" onClick={() => deletePublication(pub)}>Delete</Button>
+                                <Button size="sm" variant="secondary" onClick={() => openAssignModal(pub)}>Assign to project</Button>
+                                <Button size="sm" variant="danger" onClick={() => deletePublication(pub)}>Delete</Button>
                             </Group>
                         )
                     }

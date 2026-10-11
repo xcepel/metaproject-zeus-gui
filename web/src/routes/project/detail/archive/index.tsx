@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Box, Button, Group, Input, rem, Stack, Text, Textarea, Title } from '@mantine/core';
+import { Alert, Box, Group, Input, rem, Stack, Text, Textarea, Title } from '@mantine/core';
 import { IconFileText, IconInfoCircle, IconUpload, IconX } from '@tabler/icons-react';
 import { Dropzone, type FileWithPath, MS_WORD_MIME_TYPE, PDF_MIME_TYPE } from '@mantine/dropzone';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
+import { Button } from '@metacentrum/design-system';
 
 import { type ArchiveProjectSchema, archiveProjectSchema } from '@/modules/project/form';
 import { useArchiveProjectMutation } from '@/modules/project/mutations';
@@ -180,7 +181,7 @@ const ProjectArchivePage = () => {
 						)}
 					/>
 					<Group justify="center" mt={10}>
-						<Button type="submit" color="green" loading={isPending}>
+						<Button variant="primary" type="submit" loading={isPending}>
 							Submit
 						</Button>
 					</Group>

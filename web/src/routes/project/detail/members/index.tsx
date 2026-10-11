@@ -1,11 +1,11 @@
-import { ActionIcon, Box, Button, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { ActionIcon, Box, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DataTable } from '@metacentrum/design-system';
+import { Button, DataTable } from '@metacentrum/design-system';
 
 import { useAddProjectMemberMutation } from '@/modules/project/mutations';
 import { addMembersSchema, addSingleMemberSchema, type AddSingleMemberSchema } from '@/modules/project/form';
@@ -103,7 +103,7 @@ const ProjectDetailMembers = () => {
 							{...register('email')}
 							error={errors.email?.message}
 						/>
-						<Button type="submit" fullWidth>
+						<Button variant="primary" type="submit" fullWidth>
 							Submit
 						</Button>
 					</Stack>
@@ -165,7 +165,7 @@ const ProjectDetailMembers = () => {
 							}
 						]}
 					/>
-					<Button color="teal" fullWidth mt={10} onClick={onClick} loading={isPending}>
+					<Button variant="primary" fullWidth style={{ marginTop: 10 }} onClick={onClick} loading={isPending}>
 						Add {pickedMembers.length} member{pickedMembers.length > 1 ? 's' : ''}
 					</Button>
 					<Group justify="center" my={10}>

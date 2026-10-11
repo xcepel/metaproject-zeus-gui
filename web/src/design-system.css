@@ -1,4 +1,4 @@
-/* Mantine is unlayered, so it always beats the Carbon reset in `carbon`. */
+/* Mantine is unlayered, so it beats the Carbon reset. */
 @layer carbon;
 
 @import '@metacentrum/design-system/tokens.css';

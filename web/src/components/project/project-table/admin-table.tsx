@@ -28,7 +28,7 @@ const ProjectAdminTable = ({ useProjectQuery, buildLink }: ProjectAdminTableProp
 	const [limit, setLimit] = useState(PAGE_SIZES[0]);
 	const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 
-	// The query key includes page/limit/sort, so changing state refetches on its own.
+	// Query key includes page/limit/sort, so state changes refetch.
 	const { data: response, isPending, isError } = useProjectQuery(page, limit, sort);
 
 	const metadata = response?.metadata ?? { totalRecords: 0, currentPage: 1 };
@@ -76,7 +76,7 @@ const ProjectAdminTable = ({ useProjectQuery, buildLink }: ProjectAdminTableProp
 				onRowClick={(project, e) => {
 					const href = buildLink(project);
 					if (e.ctrlKey || e.metaKey || ('button' in e && e.button === 1)) {
-						// buildLink may be relative (e.g. requests), so resolve it against the current path.
+						// buildLink may be relative; resolve it against the current path.
 						window.open(resolvePath(href, location.pathname).pathname, '_blank');
 					} else navigate(href);
 				}}

@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Divider, Flex, Group, Select, Stack, Text, Textarea, Title } from '@mantine/core';
+import { Anchor, Box, Divider, Flex, Group, Select, Stack, Text, Textarea, Title } from '@mantine/core';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { HTTPError } from 'ky';
-import { DataTable } from '@metacentrum/design-system';
+import { Button, DataTable } from '@metacentrum/design-system';
 
 import { type AllocationDetail } from '@/modules/allocation/model';
 import { getCurrentRole } from '@/modules/auth/methods/getCurrentRole';
@@ -324,10 +324,10 @@ const AllocationInfo = ({ allocation, isApprovePage, onSuccess }: AllocationInfo
 
 			{showAdminPage && (
 				<Group mt={15} justify="end">
-					<Button type="submit" color="green" loading={isPending}>
+					<Button type="submit" variant="primary" loading={isPending}>
 						Approve
 					</Button>
-					<Button type="button" color="red" loading={isPending} onClick={onDeny}>
+					<Button type="button" variant="danger" loading={isPending} onClick={onDeny}>
 						Deny
 					</Button>
 				</Group>

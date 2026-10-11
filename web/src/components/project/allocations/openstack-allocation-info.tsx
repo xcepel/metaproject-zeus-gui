@@ -1,7 +1,8 @@
-import { Accordion, Badge, Button, Card, Group, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
+import { Accordion, Badge, Card, Group, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconCheck, IconClock, IconGitMerge, IconGitPullRequest, IconX, IconEdit } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
+import { Button } from '@metacentrum/design-system';
 
 import { type AllocationDetail, type OpenstackRequest, type OpenstackRequestStatus, type MergeRequestState } from '@/modules/allocation/model';
 import OpenstackModifyModal from './openstack-modify-modal';
@@ -335,9 +336,8 @@ const OpenstackAllocationInfo = ({ data, history, canModify, allocationId, isCha
 					{canModify && isChangeable && (
 						<Group justify="flex-end" mt="md">
 							<Button
-								leftSection={<IconEdit size={16} />}
-								variant="light"
-								color="blue"
+								icon={<IconEdit size={16} />}
+								variant="secondary"
 								onClick={() => setModifyModalOpened(true)}
 							>
 								Request Modification

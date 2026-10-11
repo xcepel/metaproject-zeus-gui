@@ -1,8 +1,8 @@
-import { Box, Button, Stack, Text, Title } from '@mantine/core';
+import { Box, Stack, Text, Title } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { DataTable, type DataTableColumn } from '@metacentrum/design-system';
+import { Button, DataTable, type DataTableColumn } from '@metacentrum/design-system';
 
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
 import { useProjectFailedStagesQuery } from '@/modules/project/queries';
@@ -82,7 +82,7 @@ const FailedProjects = () => {
 			header: '',
 			render: stage => (
 				<Button
-					variant="light"
+					variant="secondary"
 					loading={stage.projectId === loadingProject}
 					disabled={loadingProject !== null && loadingProject !== stage.projectId}
 					onClick={() => synchronizeProject(stage.projectId)}

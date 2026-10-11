@@ -1,13 +1,15 @@
-import { Alert, Box, Button, Divider, Group, rem, Title, Tooltip } from '@mantine/core';
+import { Alert, Box, Divider, Group, rem, Title, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IconChevronRight, IconInfoCircle } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
 import { FormProvider, useForm } from 'react-hook-form';
 import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@metacentrum/design-system';
 
+import RouterLink from '@/components/global/router-link';
 import { useProjectOutletContext } from '@/modules/auth/guards/project-detail-guard';
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import ProjectInfo from '@/components/project/info';
@@ -121,10 +123,10 @@ const ProjectRequestDetail = () => {
 							inputHtmlName="reason"
 						/>
 						<Group justify="flex-end" mt={10}>
-							<Button variant="outline" color="gray" onClick={() => modals.closeAll()}>
+							<Button variant="secondary" onClick={() => modals.closeAll()}>
 								{t('routes.ProjectRequestDetail.reject_modal.cancel_text')}
 							</Button>
-							<Button type="submit" color="red.7" loading={isRejectPending}>
+							<Button type="submit" variant="danger" loading={isRejectPending}>
 								{t('routes.ProjectRequestDetail.reject_modal.confirm_text')}
 							</Button>
 						</Group>
@@ -149,13 +151,13 @@ const ProjectRequestDetail = () => {
 				</Title>
 				<Tooltip label={t('routes.ProjectRequestDetail.view_project_tooltip')}>
 					<Button
-						component={Link}
-						to={`/project/${project.id}`}
-						target="_blank"
-						variant="subtle"
-						rightSection={<IconChevronRight style={{ width: rem(14), height: rem(14) }} />}
+						href={`/project/${project.id}`}
+						linkAs={RouterLink}
+						{...{ target: '_blank' }}
+						variant="ghost"
 					>
 						{t('routes.ProjectRequestDetail.view_project')}
+						<IconChevronRight style={{ width: rem(14), height: rem(14) }} />
 					</Button>
 				</Tooltip>
 			</Group>
@@ -176,15 +178,10 @@ const ProjectRequestDetail = () => {
 				</Group>
 			)}
 			<Group grow pt={20} pb={70}>
-				<Button color="green" onClick={openApproveModal} disabled={currentRole === Role.DIRECTOR}>
+				<Button variant="primary" onClick={openApproveModal} disabled={currentRole === Role.DIRECTOR}>
 					{t('routes.ProjectRequestDetail.approve_button')}
 				</Button>
-				<Button
-					color="red.7"
-					variant="outline"
-					onClick={openRejectModal}
-					disabled={currentRole === Role.DIRECTOR}
-				>
+				<Button variant="danger" onClick={openRejectModal} disabled={currentRole === Role.DIRECTOR}>
 					{t('routes.ProjectRequestDetail.reject_button')}
 				</Button>
 			</Group>

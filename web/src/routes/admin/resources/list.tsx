@@ -1,7 +1,6 @@
 import {
 	Anchor,
 	Box,
-	Button,
 	Group,
 	type RenderTreeNodePayload,
 	Stack,
@@ -15,8 +14,9 @@ import { IconChevronDown, IconChevronRight, IconLink, IconPlus, IconSettings } f
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import React, { useMemo } from 'react';
-import { EmptyState } from '@metacentrum/design-system';
+import { Button, EmptyState } from '@metacentrum/design-system';
 
+import RouterLink from '@/components/global/router-link';
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import Loading from '@/components/global/loading';
 import ErrorAlert from '@/components/global/error-alert';
@@ -97,18 +97,21 @@ const ResourceList = () => {
 			<Group justify="space-between">
 				<Title order={2}>{t('routes.ResourceList.title')}</Title>
 				<Group>
-					<Button component={Link} to="attributes" variant="light" leftSection={<IconSettings />}>
+					<Button href="attributes" linkAs={RouterLink} variant="secondary" icon={<IconSettings />}>
 						{t('routes.ResourceList.attributes_button')}
 					</Button>
 					<Tooltip label={t('routes.ResourceList.director_warning')} disabled={currentRole === Role.ADMIN}>
-						<Button
-							component={Link}
-							to="add"
-							leftSection={<IconPlus />}
-							disabled={currentRole === Role.DIRECTOR}
-						>
-							{t('routes.ResourceList.add_button')}
-						</Button>
+						<span>
+							<Button
+								href={currentRole === Role.DIRECTOR ? undefined : 'add'}
+								linkAs={RouterLink}
+								variant="primary"
+								icon={<IconPlus />}
+								disabled={currentRole === Role.DIRECTOR}
+							>
+								{t('routes.ResourceList.add_button')}
+							</Button>
+						</span>
 					</Tooltip>
 				</Group>
 			</Group>

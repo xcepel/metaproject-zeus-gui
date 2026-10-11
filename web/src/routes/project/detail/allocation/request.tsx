@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Group, Stack, Stepper, Text, Title } from '@mantine/core';
+import { Box, Group, Stack, Stepper, Text, Title } from '@mantine/core';
 import React, { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
+import { Button } from '@metacentrum/design-system';
 
 import { useProjectOutletContext } from '@/modules/auth/guards/project-detail-guard';
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
@@ -210,11 +211,11 @@ const AllocationRequest = () => {
 				{active < MAX_STEPS - 1 && (
 					<Group justify="center" mt="xl">
 						{active > 0 && (
-							<Button variant="default" onClick={prevStep}>
+							<Button variant="secondary" onClick={prevStep}>
 								{t('routes.AllocationRequest.form.buttons.back')}
 							</Button>
 						)}
-						<Button disabled={!doneSteps.has(active)} onClick={nextStep}>
+						<Button variant="primary" disabled={!doneSteps.has(active)} onClick={nextStep}>
 							{t('routes.AllocationRequest.form.buttons.next')}
 						</Button>
 					</Group>

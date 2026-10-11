@@ -26,7 +26,7 @@ const AllocationAdminTable = ({ useAllocationQuery, buildLink }: AllocationAdmin
 	const [limit, setLimit] = useState(PAGE_SIZES[0]);
 	const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 
-	// The query key includes page/limit/sort, so changing state refetches on its own.
+	// Query key includes page/limit/sort, so state changes refetch.
 	const { data: response, isPending, isError } = useAllocationQuery(page, limit, sort);
 
 	const metadata = response?.metadata ?? { totalRecords: 0, currentPage: 1 };

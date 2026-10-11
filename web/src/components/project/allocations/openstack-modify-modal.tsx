@@ -1,5 +1,4 @@
 import {
-	Button,
 	Fieldset,
 	Group,
 	Modal,
@@ -21,6 +20,7 @@ import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, type ControllerRenderProps, type FieldArrayWithId, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Button } from '@metacentrum/design-system';
 
 import { type OpenstackRequest } from '@/modules/allocation/model';
 import { useModifyOpenstackAllocationMutation } from '@/modules/allocation/api/modify-openstack-allocation';
@@ -620,8 +620,8 @@ const OpenstackModifyModal = ({ opened, onClose, allocationId, currentRequest }:
 										/>
 										<Button
 											type="button"
-											variant="subtle"
-											size="xs"
+											variant="ghost"
+											size="sm"
 											onClick={() => remove(index)}
 											disabled={fields.length === 1}
 										>
@@ -631,8 +631,8 @@ const OpenstackModifyModal = ({ opened, onClose, allocationId, currentRequest }:
 								))}
 								<Button
 									type="button"
-									variant="light"
-									size="xs"
+									variant="secondary"
+									size="sm"
 									onClick={() => append({ key: '', value: 0 } as QuotaEntry)}
 									disabled={quotaOptions.length > 0 && fields.length >= quotaOptions.length}
 								>
@@ -762,8 +762,8 @@ const OpenstackModifyModal = ({ opened, onClose, allocationId, currentRequest }:
 											/>
 											<Button
 												type="button"
-												variant="subtle"
-												size="xs"
+												variant="ghost"
+												size="sm"
 												onClick={() => removeNetwork(index)}
 											>
 												Remove
@@ -773,8 +773,8 @@ const OpenstackModifyModal = ({ opened, onClose, allocationId, currentRequest }:
 								})}
 								<Button
 									type="button"
-									variant="light"
-									size="xs"
+									variant="secondary"
+									size="sm"
 									onClick={() => appendNetwork({ name: '', accessType: 'external' } as NetworkEntry)}
 									disabled={networkOptions.length === 0}
 								>
@@ -787,10 +787,10 @@ const OpenstackModifyModal = ({ opened, onClose, allocationId, currentRequest }:
 						</Fieldset>
 
 						<Group justify="flex-end" mt="md">
-							<Button variant="default" onClick={onClose}>
+							<Button variant="secondary" onClick={onClose}>
 								Cancel
 							</Button>
-							<Button type="submit" loading={isPending}>
+							<Button variant="primary" type="submit" loading={isPending}>
 								Submit Modification Request
 							</Button>
 						</Group>

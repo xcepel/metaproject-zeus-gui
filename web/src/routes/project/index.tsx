@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Tabs } from '@mantine/core';
+import { Box } from '@mantine/core';
 import { IconActivity, IconArchive, IconBan, IconClockQuestion, IconPlus } from '@tabler/icons-react';
-import { PageHeader } from '@metacentrum/design-system';
+import { Button, PageHeader, Tabs } from '@metacentrum/design-system';
 
 import RouterLink from '@/components/global/router-link';
 import ProjectTable from '@/components/project/project-table';
@@ -60,71 +60,62 @@ const Project: React.FC = () => {
 				title={t('routes.Dashboard.title')}
 				linkAs={RouterLink}
 				actions={
-					<Button component={Link} to="add" variant="contained" leftSection={<IconPlus />}>
+					<Button href="add" linkAs={RouterLink} icon={<IconPlus />}>
 						{t('routes.Dashboard.requestButton')}
 					</Button>
 				}
 			/>
-			<Tabs value={currentTab} onChange={setCurrentTab}>
-				<Tabs.List>
-					<Tabs.Tab onClick={() => activateTab('active')} value="active" leftSection={<IconActivity />}>
-						{t('routes.Dashboard.activeProjects.title')}
-					</Tabs.Tab>
-					<Tabs.Tab
-						onClick={() => activateTab('requested')}
-						value="requested"
-						leftSection={<IconClockQuestion />}
-					>
-						{t('routes.Dashboard.requestedProjects.title')}
-					</Tabs.Tab>
-					<Tabs.Tab
-						onClick={() => activateTab('archived')}
-						value="archived"
-						leftSection={<IconArchive />}
-					>
-						{t('routes.Dashboard.archivedProjects.title')}
-					</Tabs.Tab>
-					<Tabs.Tab onClick={() => activateTab('rejected')} value="rejected" leftSection={<IconBan />}>
-						{t('routes.Dashboard.rejectedProjects.title')}
-					</Tabs.Tab>
-				</Tabs.List>
-
-				<Tabs.Panel value="active">
-					{activeClicked && (
-						<ProjectTable
-							title={t('routes.Dashboard.activeProjects.title')}
-							status={ProjectStatus.ACTIVE}
-						/>
-					)}
-				</Tabs.Panel>
-
-				<Tabs.Panel value="requested">
-					{requestedClicked && (
-						<ProjectTable
-							title={t('routes.Dashboard.requestedProjects.title')}
-							status={ProjectStatus.NEW}
-						/>
-					)}
-				</Tabs.Panel>
-
-				<Tabs.Panel value="archived">
-					{archivedClicked && (
-						<ProjectTable
-							title={t('routes.Dashboard.archivedProjects.title')}
-							status={ProjectStatus.ARCHIVED}
-						/>
-					)}
-				</Tabs.Panel>
-
-				<Tabs.Panel value="rejected">
-					{rejectedClicked && (
-						<ProjectTable
-							title={t('routes.Dashboard.rejectedProjects.title')}
-							status={ProjectStatus.REJECTED}
-						/>
-					)}
-				</Tabs.Panel>
-			</Tabs>
+			<Tabs
+				aria-label={t('routes.Dashboard.title')}
+				selected={currentTab ?? 'active'}
+				onChange={activateTab}
+				tabs={[
+					{
+						id: 'active',
+						label: t('routes.Dashboard.activeProjects.title'),
+						icon: <IconActivity />,
+						content: activeClicked && (
+							<ProjectTable
+								title={t('routes.Dashboard.activeProjects.title')}
+								status={ProjectStatus.ACTIVE}
+							/>
+						)
+					},
+					{
+						id: 'requested',
+						label: t('routes.Dashboard.requestedProjects.title'),
+						icon: <IconClockQuestion />,
+						content: requestedClicked && (
+							<ProjectTable
+								title={t('routes.Dashboard.requestedProjects.title')}
+								status={ProjectStatus.NEW}
+							/>
+						)
+					},
+					{
+						id: 'archived',
+						label: t('routes.Dashboard.archivedProjects.title'),
+						icon: <IconArchive />,
+						content: archivedClicked && (
+							<ProjectTable
+								title={t('routes.Dashboard.archivedProjects.title')}
+								status={ProjectStatus.ARCHIVED}
+							/>
+						)
+					},
+					{
+						id: 'rejected',
+						label: t('routes.Dashboard.rejectedProjects.title'),
+						icon: <IconBan />,
+						content: rejectedClicked && (
+							<ProjectTable
+								title={t('routes.Dashboard.rejectedProjects.title')}
+								status={ProjectStatus.REJECTED}
+							/>
+						)
+					}
+				]}
+			/>
 		</Box>
 	);
 };

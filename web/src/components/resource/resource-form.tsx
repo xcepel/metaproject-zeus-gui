@@ -1,7 +1,8 @@
-import { Box, Button, Checkbox, Group, NumberInput, Select, Textarea, TextInput } from '@mantine/core';
+import { Box, Checkbox, Group, NumberInput, Select, Textarea, TextInput } from '@mantine/core';
 import { Controller, useFormContext } from 'react-hook-form';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@metacentrum/design-system';
 
 import CustomAttributes from '@/components/resource/attributes/custom-attributes';
 import { type Attribute } from '@/modules/attribute/model';
@@ -209,7 +210,7 @@ const ResourceForm = ({ isPending, attributes, setAttributes, onSubmit, defaultV
 				attributes={resourceAttributes}
 				setAttributes={attributes => setAttributes(attributes)}
 			/>
-			<Button loading={isPending} type="submit">
+			<Button variant="primary" loading={isPending} type="submit">
 				{t('routes.ResourceAddPage.form.submit')}
 			</Button>
 		</form>

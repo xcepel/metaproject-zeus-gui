@@ -1,11 +1,12 @@
-import { Badge, Box, Button, Group, Stack, Text, Title } from '@mantine/core';
+import { Badge, Box, Group, Stack, Text, Title } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { IconBan, IconCheck, IconClock, IconClockX, IconCpu, IconNews, IconPlus } from '@tabler/icons-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { DataTable, type DataTableSort } from '@metacentrum/design-system';
+import { Button, DataTable, type DataTableSort } from '@metacentrum/design-system';
 
+import RouterLink from '@/components/global/router-link';
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
 import { getSortQuery } from '@/modules/api/sorting/utils';
 import Loading from '@/components/global/loading';
@@ -64,10 +65,10 @@ const ProjectAllocationsTable = ({ id }: ProjectAllocationTableProps) => {
 					</Badge>
 				</Group>
 				<Button
-					component={Link}
-					to={`/project/${id}/allocation`}
-					color="green"
-					leftSection={<IconPlus size={14} />}
+					href={`/project/${id}/allocation`}
+					linkAs={RouterLink}
+					variant="primary"
+					icon={<IconPlus size={14} />}
 				>
 					{t('components.project.allocations.index.request_allocation')}
 				</Button>

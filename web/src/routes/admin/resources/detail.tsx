@@ -1,10 +1,12 @@
 import { useParams } from 'react-router';
-import { Anchor, Badge, Box, Button, Group, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Badge, Box, Group, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { IconPencil } from '@tabler/icons-react';
+import { Button } from '@metacentrum/design-system';
 
+import RouterLink from '@/components/global/router-link';
 import NotFound from '@/components/global/not-found';
 import Loading from '@/components/global/loading';
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
@@ -50,7 +52,7 @@ const ResourceDetailPage = () => {
 				<Group justify="space-between">
 					<Title>{t('routes.ResourceDetailPage.title')}</Title>
 					{currentRole === Role.ADMIN && (
-						<Button component={Link} to="edit" variant="light" leftSection={<IconPencil size={16} />}>
+						<Button href="edit" linkAs={RouterLink} variant="secondary" icon={<IconPencil size={16} />}>
 							{t('routes.ResourceDetailPage.edit_button')}
 						</Button>
 					)}

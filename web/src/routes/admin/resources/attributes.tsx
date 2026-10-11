@@ -1,17 +1,4 @@
-import {
-	Anchor,
-	Badge,
-	Box,
-	Button,
-	Checkbox,
-	Group,
-	Select,
-	Stack,
-	Text,
-	TextInput,
-	Title,
-	Tooltip
-} from '@mantine/core';
+import { Anchor, Badge, Box, Checkbox, Group, Select, Stack, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
@@ -20,7 +7,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { notifications } from '@mantine/notifications';
 import { HTTPError } from 'ky';
-import { EmptyState } from '@metacentrum/design-system';
+import { Button, EmptyState } from '@metacentrum/design-system';
 
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import Loading from '@/components/global/loading';
@@ -151,7 +138,7 @@ const ResourceAttributesPage = () => {
 							description={t('routes.ResourceAttributesPage.add_modal.is_required_description')}
 							{...register('isRequired')}
 						/>
-						<Button loading={isAddAttributeTypePending} type="submit">
+						<Button variant="primary" loading={isAddAttributeTypePending} type="submit">
 							{t('routes.ResourceAttributesPage.add_modal.submit')}
 						</Button>
 					</Stack>
@@ -181,13 +168,16 @@ const ResourceAttributesPage = () => {
 						label={t('routes.ResourceAttributesPage.director_warning')}
 						disabled={currentRole === Role.ADMIN}
 					>
-						<Button
-							onClick={openAddModal}
-							leftSection={<IconPlus />}
-							disabled={currentRole === Role.DIRECTOR}
-						>
-							{t('routes.ResourceAttributesPage.add_button')}
-						</Button>
+						<span>
+							<Button
+								variant="primary"
+								onClick={openAddModal}
+								icon={<IconPlus />}
+								disabled={currentRole === Role.DIRECTOR}
+							>
+								{t('routes.ResourceAttributesPage.add_button')}
+							</Button>
+						</span>
 					</Tooltip>
 				</Group>
 			</Group>

@@ -1,6 +1,9 @@
-import { Link, useRouteError } from 'react-router-dom';
+import { useRouteError } from 'react-router-dom';
 import React from 'react';
-import { Button, Container, Group, Text, Title } from '@mantine/core';
+import { Container, Group, Text, Title } from '@mantine/core';
+import { Button } from '@metacentrum/design-system';
+
+import RouterLink from '@/components/global/router-link';
 
 import classes from './error.module.css';
 
@@ -21,7 +24,7 @@ const ErrorPage: React.FC = () => {
 						Error occurred while loading the page. Please try again later.
 					</Text>
 					<Group justify="center">
-						<Button size="md" component={Link} to="/">
+						<Button variant="primary" href="/" linkAs={RouterLink}>
 							Take me back to home page
 						</Button>
 					</Group>

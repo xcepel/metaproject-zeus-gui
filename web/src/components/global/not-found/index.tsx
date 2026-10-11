@@ -1,5 +1,7 @@
-import { Button, Container, Group, Text, Title } from '@mantine/core';
-import { Link } from 'react-router-dom';
+import { Container, Group, Text, Title } from '@mantine/core';
+import { Button } from '@metacentrum/design-system';
+
+import RouterLink from '@/components/global/router-link';
 
 import classes from './not-found.module.css';
 
@@ -13,7 +15,7 @@ const NotFound = () => (
 					moved to another URL. If you think this is an error contact support.
 				</Text>
 				<Group justify="center">
-					<Button size="md" component={Link} to="/">
+					<Button variant="primary" href="/" linkAs={RouterLink}>
 						Take me back to home page
 					</Button>
 				</Group>
