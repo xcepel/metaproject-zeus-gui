@@ -1,5 +1,4 @@
 import {
-	Alert,
 	Anchor,
 	Box,
 	Button,
@@ -16,6 +15,7 @@ import { IconChevronDown, IconChevronRight, IconLink, IconPlus, IconSettings } f
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import React, { useMemo } from 'react';
+import { EmptyState } from '@metacentrum/design-system';
 
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import Loading from '@/components/global/loading';
@@ -113,11 +113,7 @@ const ResourceList = () => {
 				</Group>
 			</Group>
 			<Box my={20}>
-				{dataTree.length === 0 && (
-					<Alert color="blue" variant="light" mt={15}>
-						No resources added yet.
-					</Alert>
-				)}
+				{dataTree.length === 0 && <EmptyState title="No resources added yet." />}
 				{dataTree.length > 0 && <Tree data={dataTree} renderNode={payload => <Leaf {...payload} />} />}
 			</Box>
 		</Box>

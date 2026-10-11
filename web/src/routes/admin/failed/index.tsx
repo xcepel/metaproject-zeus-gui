@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
+import { EmptyState } from '@metacentrum/design-system';
 
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
 import { useProjectFailedStagesQuery } from '@/modules/project/queries';
@@ -68,11 +69,7 @@ const FailedProjects = () => {
 			/>
 			<Title order={2}>{t('routes.FailedStages.title')}</Title>
 			<Box mt={15}>
-				{stages.length === 0 && (
-					<Alert color="blue" variant="light" mt={15}>
-						{t('routes.FailedStages.error.noFailedStages')}
-					</Alert>
-				)}
+				{stages.length === 0 && <EmptyState title={t('routes.FailedStages.error.noFailedStages')} />}
 				{stages.length > 0 && (
 					<DataTable
 						records={stages}

@@ -36,6 +36,10 @@
         "title": "Ooops!",
         "description": "Something went wrong. Please try again later."
       },
+      "errorAlert": {
+        "title": "Something went wrong",
+        "description": "Please try again later."
+      },
       "drawerList": {
         "links": {
           "projects": {

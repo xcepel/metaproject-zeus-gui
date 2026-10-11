@@ -1,5 +1,4 @@
 import {
-	Alert,
 	Anchor,
 	Badge,
 	Box,
@@ -21,6 +20,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { notifications } from '@mantine/notifications';
 import { HTTPError } from 'ky';
+import { EmptyState } from '@metacentrum/design-system';
 
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import Loading from '@/components/global/loading';
@@ -191,11 +191,7 @@ const ResourceAttributesPage = () => {
 					</Tooltip>
 				</Group>
 			</Group>
-			{valuesToShow.length === 0 && (
-				<Alert color="blue" variant="light" mt={15}>
-					No custom attributes added yet.
-				</Alert>
-			)}
+			{valuesToShow.length === 0 && <EmptyState title="No custom attributes added yet." />}
 			{valuesToShow.length > 0 && (
 				<Stack mt={20} gap={15}>
 					{valuesToShow.map(item => (

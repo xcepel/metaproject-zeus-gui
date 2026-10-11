@@ -3,6 +3,7 @@ import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { EmptyState } from '@metacentrum/design-system';
 
 import classes from '@/routes/project/project.module.css';
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
@@ -76,11 +77,7 @@ const ProjectTable = ({ status, title }: ProjectTableProps) => {
 		<Box mt={15}>
 			<Title order={4}>{title}</Title>
 			<Box mt={15}>
-				{projects.length === 0 && (
-					<Alert color="blue" variant="light" mt={15}>
-						{t('routes.Dashboard.error.noActiveProjects')}
-					</Alert>
-				)}
+				{projects.length === 0 && <EmptyState title={t('routes.Dashboard.error.noActiveProjects')} />}
 				{projects.length > 0 && (
 					<DataTable
 						height="70vh"

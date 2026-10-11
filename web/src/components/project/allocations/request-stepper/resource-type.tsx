@@ -1,4 +1,4 @@
-import { Alert, Group, rem } from '@mantine/core';
+import { Group, rem } from '@mantine/core';
 import {
 	IconCloud,
 	IconComponents,
@@ -10,6 +10,7 @@ import {
 	IconCloudComputing
 } from '@tabler/icons-react';
 import React from 'react';
+import { EmptyState } from '@metacentrum/design-system';
 
 import Loading from '@/components/global/loading';
 import ErrorAlert from '@/components/global/error-alert';
@@ -73,15 +74,12 @@ const ResourceTypeStep = ({ setComplete, resourceTypeId, setResourceType }: Reso
 		setComplete();
 	};
 
-	const resourceTypes: ResourceType[] =
-		data?.filter((resourceType: ResourceType) => resourceType.hasResources) ?? [];
+	const resourceTypes: ResourceType[] = data?.filter((resourceType: ResourceType) => resourceType.hasResources) ?? [];
 
 	return (
 		<Group justify="center">
 			{resourceTypes.length === 0 && (
-				<Alert color="blue" variant="light" mt={15}>
-					No resources added yet. Please wait for admin to add some resources.
-				</Alert>
+				<EmptyState title="No resources added yet. Please wait for admin to add some resources." />
 			)}
 			{resourceTypes.length > 0 &&
 				resourceTypes.map((resourceType: ResourceType) => (

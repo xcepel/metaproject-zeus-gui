@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { type UseQueryResult } from '@tanstack/react-query';
+import { EmptyState } from '@metacentrum/design-system';
 
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
 import { strip } from '@/modules/html/strip';
@@ -49,11 +50,7 @@ const ProjectAdminTable = ({ useProjectQuery, buildLink }: ProjectAdminTableProp
 
 	return (
 		<Box mt={15}>
-			{projects.length === 0 && (
-				<Alert color="blue" variant="light" mt={15}>
-					{t('components.projectTable.admin.noProjects')}
-				</Alert>
-			)}
+			{projects.length === 0 && <EmptyState title={t('components.projectTable.admin.noProjects')} />}
 			{projects.length > 0 && (
 				<DataTable
 					records={projects}
