@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
 	Box,
-	Container,
 	SimpleGrid,
 	Stack,
 	Title,
@@ -79,7 +78,7 @@ const UsageDashboard = () => {
 		(data?.availableSources?.length === 1 && data?.availableSources[0] === 'openstack');
 
 	return (
-		<Container size="xl" py="lg">
+		<Box>
 			<Stack gap="xl">
 				<div>
 					<Title order={2}>Resource usage</Title>
@@ -198,7 +197,7 @@ const UsageDashboard = () => {
 					</Box>
 				)}
 			</Stack>
-		</Container>
+		</Box>
 	);
 };
 

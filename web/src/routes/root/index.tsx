@@ -3,12 +3,11 @@ import { Outlet } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
 import { Flex, Group, Image, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { Footer } from '@metacentrum/design-system';
+import { Footer, PageContainer } from '@metacentrum/design-system';
 
 import Loading from '@/components/global/loading';
 
 import Navbar from '../../components/global/navbar';
-import MainContentWrapper from '../../components/global/content-wrapper';
 
 const Root: React.FC = () => {
 	const { t } = useTranslation();
@@ -20,9 +19,9 @@ const Root: React.FC = () => {
 			<Flex direction="column" mih="100vh" pt="var(--mc-header-height)">
 				<Suspense fallback={<Loading />}>
 					<main id="main-content" style={{ flex: 1 }}>
-						<MainContentWrapper>
+						<PageContainer>
 							<Outlet />
-						</MainContentWrapper>
+						</PageContainer>
 					</main>
 				</Suspense>
 				<Footer

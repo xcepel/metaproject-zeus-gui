@@ -1,7 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import React from 'react';
-import { Box, Flex } from '@mantine/core';
 
 import Loading from '@/components/global/loading';
 import { getStepUpAccess } from '@/modules/auth/methods/getStepUpAccess';
@@ -30,13 +29,7 @@ const AdminRouteGuard = () => {
 		}
 	}
 
-	return (
-		<Flex mt={15} direction="column" align="center">
-			<Box w="80%" mt={20}>
-				<Outlet />
-			</Box>
-		</Flex>
-	);
+	return <Outlet />;
 };
 
 export default AdminRouteGuard;

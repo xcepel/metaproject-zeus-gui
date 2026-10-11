@@ -4,7 +4,6 @@ import {
 	Badge,
 	Box,
 	Button,
-	Divider,
 	Group,
 	Loader,
 	rem,
@@ -20,9 +19,10 @@ import { IconArchive, IconBan, IconInfoCircle, IconRepeat } from '@tabler/icons-
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { PageHeader } from '@metacentrum/design-system';
 
 import ProjectMembers from '@/components/project/members';
-import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
+import RouterLink from '@/components/global/router-link';
 import { ProjectStatus } from '@/modules/project/constants';
 import FileView from '@/components/project/file';
 import { useProjectOutletContext } from '@/modules/auth/guards/project-detail-guard';
@@ -72,29 +72,13 @@ const ProjectDetail = () => {
 
 	return (
 		<Box>
-			<PageBreadcrumbs
-				links={[
-					{ title: 'Projects', href: '/project' },
-					{ title: project.title, href: `/project/${project.id}` }
-				]}
-			/>
-			<Group justify="space-between">
-				<Title>{project.title}</Title>
-				<Group>
-					<Badge
-						variant="light"
-						size="lg"
-						color={
-							project.status === ProjectStatus.ACTIVE
-								? 'teal'
-								: project.status === ProjectStatus.NEW
-									? 'orange'
-									: 'red'
-						}
-					>
-						{t(`routes.ProjectDetail.status.${project.status}`)}
-					</Badge>
-					{permissions.includes('edit_project') && project.status === 'active' && (
+			<PageHeader
+				title={project.title}
+				breadcrumbs={[{ label: 'Projects', href: '/project' }, { label: project.title }]}
+				linkAs={RouterLink}
+				actions={
+					permissions.includes('edit_project') &&
+					project.status === 'active' && (
 						<Tooltip label="Archive project" position="bottom">
 							<ActionIcon
 								component={Link}
@@ -108,10 +92,23 @@ const ProjectDetail = () => {
 								<IconArchive style={{ width: rem(24), height: rem(24) }} stroke={1.5} />
 							</ActionIcon>
 						</Tooltip>
-					)}
-				</Group>
-			</Group>
-			<Divider my={10} />
+					)
+				}
+			>
+				<Badge
+					variant="light"
+					size="lg"
+					color={
+						project.status === ProjectStatus.ACTIVE
+							? 'teal'
+							: project.status === ProjectStatus.NEW
+								? 'orange'
+								: 'red'
+					}
+				>
+					{t(`routes.ProjectDetail.status.${project.status}`)}
+				</Badge>
+			</PageHeader>
 			{project.status === ProjectStatus.NEW && (
 				<Alert mt={5} variant="light" color="yellow" title="Project is not active" icon={<IconInfoCircle />}>
 					Current project, which you are editing is not yet accepted. You can only request allocations,

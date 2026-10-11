@@ -45,7 +45,7 @@ const ProjectDetailGuard = () => {
 	const rejectedComments = projectData.rejectedComments;
 
 	return (
-		<MainContentWrapper mt={30}>
+		<MainContentWrapper>
 			<Outlet context={{ project, permissions, archivalInfo, rejectedComments }} />
 		</MainContentWrapper>
 	);

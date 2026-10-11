@@ -120,7 +120,7 @@ const AddProject: React.FC = () => {
 			/>
 			<Flex mt={20} direction="column" align="center">
 				<Title order={1}>{t('routes.AddProject.title')}</Title>
-				<Box w="80%" py={20}>
+				<Box w="100%" py={20}>
 					<FormProvider {...form}>
 						<RequestForm
 							onSubmit={onSubmit}

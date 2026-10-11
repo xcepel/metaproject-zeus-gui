@@ -1,6 +1,5 @@
-import { type AnchorHTMLAttributes, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import {
 	IconActivity,
@@ -22,11 +21,7 @@ import { useAdminContext } from '@/modules/auth/admin-context';
 import { IS_USER_STEP_UP, MAX_ROLE } from '@/modules/auth/constants';
 import { Role } from '@/modules/user/role';
 import useStepUpAction from '@/hooks/useStepUpAction';
-
-const RouterLink = forwardRef<HTMLAnchorElement, { href: string } & AnchorHTMLAttributes<HTMLAnchorElement>>(
-	({ href, ...rest }, ref) => <Link ref={ref} to={href} {...rest} />
-);
-RouterLink.displayName = 'RouterLink';
+import RouterLink from '@/components/global/router-link';
 
 type LinkNode = {
 	title: string;

@@ -17,7 +17,7 @@ const PageBreadcrumbs = ({ links }: PageBreadcrumbProps) => {
 		</Anchor>
 	));
 	return (
-		<Breadcrumbs mt={30} mb={20} separatorMargin="md">
+		<Breadcrumbs mb={20} separatorMargin="md">
 			{items}
 		</Breadcrumbs>
 	);

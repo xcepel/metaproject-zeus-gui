@@ -130,7 +130,7 @@ const ProjectRequestPage = () => {
 			/>
 			<Flex mt={20} direction="column" align="center">
 				<Title order={1}>{t('routes.ProjectRequestPage.title')}</Title>
-				<Box w="80%" py={20}>
+				<Box w="100%" py={20}>
 					<Spoiler
 						maxHeight={200}
 						showLabel={t('routes.ProjectRequestPage.activity.show_more')}

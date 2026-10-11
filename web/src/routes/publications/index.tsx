@@ -1,4 +1,4 @@
-import { Box, Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Box, Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core';
 import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
@@ -7,8 +7,9 @@ import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
 import { IconLibrary } from '@tabler/icons-react';
 import { HTTPError } from 'ky';
+import { PageHeader } from '@metacentrum/design-system';
 
-import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
+import RouterLink from '@/components/global/router-link';
 import { PUBLICATION_PAGE_SIZES } from '@/modules/publication/constants';
 import { getSortQuery } from '@/modules/api/sorting/utils';
 import { useAssignMyPublicationMutation, useDeleteMyPublicationMutation, useMyPublicationsQuery } from '@/modules/publication/my-queries';
@@ -264,12 +265,17 @@ const MyPublicationsPage = () => {
                 </form>
             </Modal>
 
-            <PageBreadcrumbs links={[{ title: 'Publications', href: '/publications' }]} />
-            <Title order={3}><IconLibrary /> My publications</Title>
-            <Group mt={10} mb={20}>
-                <Button color="teal" onClick={openAddModal}>Add publication manually</Button>
-                <Button color="blue" onClick={openAddDoiModal}>Add by DOI</Button>
-            </Group>
+            <PageHeader
+                title="My publications"
+                icon={<IconLibrary />}
+                linkAs={RouterLink}
+                actions={
+                    <>
+                        <Button color="teal" onClick={openAddModal}>Add publication manually</Button>
+                        <Button color="blue" onClick={openAddDoiModal}>Add by DOI</Button>
+                    </>
+                }
+            />
             <DataTable
                 height={500}
                 withTableBorder
