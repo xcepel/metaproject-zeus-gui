@@ -1,18 +1,15 @@
-import { Alert, Box, Title } from '@mantine/core';
-import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
+import { Box, Title } from '@mantine/core';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { EmptyState } from '@metacentrum/design-system';
+import { DataTable, type DataTableColumn, type DataTableSort } from '@metacentrum/design-system';
 
-import classes from '@/routes/project/project.module.css';
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
 import { type ProjectStatus } from '@/modules/project/constants';
 import { useProjectsQuery } from '@/modules/project/queries';
 import type { Project } from '@/modules/project/model';
 import { getSortQuery } from '@/modules/api/sorting/utils';
 import { strip } from '@/modules/html/strip';
-import Loading from '@/components/global/loading';
 
 type ProjectTableProps = {
 	title: string;
@@ -22,101 +19,72 @@ type ProjectTableProps = {
 const ProjectTable = ({ status, title }: ProjectTableProps) => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(PAGE_SIZES[0]);
-	const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Project>>({
-		columnAccessor: 'id',
-		direction: 'asc'
-	});
+	const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	// The query key includes page/limit/sort, so changing state refetches on its own.
 	const {
 		data: response,
 		isPending,
-		isError,
-		refetch
-	} = useProjectsQuery(
-		status,
+		isError
+	} = useProjectsQuery(status, { page, limit }, getSortQuery(sort.key, sort.direction));
+
+	const metadata = response?.metadata ?? { totalRecords: 0, currentPage: 1 };
+	const projects = response?.data ?? [];
+
+	const columns: DataTableColumn<Project>[] = [
 		{
-			page,
-			limit
+			key: 'id',
+			header: t('routes.Dashboard.table.id'),
+			width: '70px',
+			sortable: true
 		},
-		getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
-	);
-
-	if (isError) {
-		return (
-			<Alert color="red" mt={15} variant="light">
-				{t('routes.Dashboard.error.connection')}
-			</Alert>
-		);
-	}
-
-	if (isPending || !response) {
-		return <Loading />;
-	}
-
-	const onPageChange = async (newPage: number) => {
-		setPage(newPage);
-		await refetch();
-	};
-
-	const onRecordsPerPageChange = async (newRecordsPerPage: number) => {
-		setLimit(newRecordsPerPage);
-		await refetch();
-	};
-
-	const onSortStatusChange = async (sortStatus: DataTableSortStatus<Project>) => {
-		setSortStatus(sortStatus);
-		await refetch();
-	};
-
-	const metadata = response.metadata ?? { totalRecords: 0, currentPage: 1 };
-	const projects = response.data ?? [];
+		{
+			key: 'title',
+			header: t('routes.Dashboard.table.name'),
+			sortable: true
+		},
+		{
+			key: 'description',
+			header: t('routes.Dashboard.table.description'),
+			render: project => {
+				const stripped = strip(project.description);
+				return stripped.length > 100 ? `${stripped.slice(0, 100)}...` : stripped;
+			}
+		}
+	];
 
 	return (
 		<Box mt={15}>
 			<Title order={4}>{title}</Title>
 			<Box mt={15}>
-				{projects.length === 0 && <EmptyState title={t('routes.Dashboard.error.noActiveProjects')} />}
-				{projects.length > 0 && (
-					<DataTable
-						height="70vh"
-						className={classes.table}
-						records={projects}
-						textSelectionDisabled
-						page={page}
-						totalRecords={metadata.totalRecords}
-						recordsPerPage={limit}
-						recordsPerPageOptions={PAGE_SIZES}
-						onPageChange={onPageChange}
-						onRecordsPerPageChange={onRecordsPerPageChange}
-						highlightOnHover
-						onRowClick={({ record }) => navigate(`/project/${record.id}`)}
-						sortStatus={sortStatus}
-						onSortStatusChange={onSortStatusChange}
-						columns={[
-							{
-								accessor: 'id',
-								title: t('routes.Dashboard.table.id'),
-								width: 70,
-								sortable: true
-							},
-							{
-								accessor: 'title',
-								title: t('routes.Dashboard.table.name'),
-								sortable: true
-							},
-							{
-								accessor: 'description',
-								title: t('routes.Dashboard.table.description'),
-								render: project => {
-									const stripped = strip(project.description);
-									return stripped.length > 100 ? `${stripped.slice(0, 100)}...` : stripped;
-								}
-							}
-						]}
-					/>
-				)}
+				<DataTable
+					columns={columns}
+					rows={projects}
+					rowKey={project => project.id}
+					onRowClick={(project, e) => {
+						const href = `/project/${project.id}`;
+						if (e.ctrlKey || e.metaKey || ('button' in e && e.button === 1)) window.open(href, '_blank');
+						else navigate(href);
+					}}
+					maxHeight="70vh"
+					sort={sort}
+					onSortChange={setSort}
+					loading={isPending}
+					error={isError ? { title: t('routes.Dashboard.error.connection') } : undefined}
+					emptyTitle={t('routes.Dashboard.error.noActiveProjects')}
+					pagination={{
+						page,
+						pageSize: limit,
+						totalItems: metadata.totalRecords,
+						pageSizes: PAGE_SIZES,
+						onChange: ({ page: nextPage, pageSize }) => {
+							setPage(nextPage);
+							setLimit(pageSize);
+						}
+					}}
+				/>
 			</Box>
 		</Box>
 	);

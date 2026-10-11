@@ -1,16 +1,15 @@
 import { Badge, Box, Button, Group, Stack, Text, Title } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
-import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
 import { IconBan, IconCheck, IconClock, IconClockX, IconCpu, IconNews, IconPlus } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { DataTable, type DataTableSort } from '@metacentrum/design-system';
 
 import { PAGE_SIZES } from '@/modules/api/pagination/constants';
 import { getSortQuery } from '@/modules/api/sorting/utils';
 import Loading from '@/components/global/loading';
 import ErrorAlert from '@/components/global/error-alert';
-import { type Allocation } from '@/modules/allocation/model';
 import { useProjectAllocationsQuery } from '@/modules/allocation/api/allocations';
 
 type ProjectAllocationTableProps = {
@@ -23,10 +22,7 @@ const ProjectAllocationsTable = ({ id }: ProjectAllocationTableProps) => {
 
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(PAGE_SIZES[0]);
-	const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Allocation>>({
-		columnAccessor: 'id',
-		direction: 'asc'
-	});
+	const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 
 	const {
 		data: allocations,
@@ -38,20 +34,8 @@ const ProjectAllocationsTable = ({ id }: ProjectAllocationTableProps) => {
 			page,
 			limit
 		},
-		getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
+		getSortQuery(sort.key, sort.direction)
 	);
-
-	const onPageChange = async (newPage: number) => {
-		setPage(newPage);
-	};
-
-	const onRecordsPerPageChange = async (newRecordsPerPage: number) => {
-		setLimit(newRecordsPerPage);
-	};
-
-	const onSortStatusChange = async (sortStatus: DataTableSortStatus<Allocation>) => {
-		setSortStatus(sortStatus);
-	};
 
 	if (isPending) {
 		return <Loading />;
@@ -89,39 +73,45 @@ const ProjectAllocationsTable = ({ id }: ProjectAllocationTableProps) => {
 				</Button>
 			</Group>
 			<DataTable
-				height={300}
-				withTableBorder
-				textSelectionDisabled
-				highlightOnHover
-				onRowClick={({ record }) => navigate(`allocation/${record.id}`)}
-				page={metadata.page}
-				totalRecords={metadata.totalRecords}
-				recordsPerPage={metadata.recordsPerPage}
-				records={allocationsData}
-				noRecordsText={t('components.project.allocations.index.no_records_text')}
-				onPageChange={onPageChange}
-				recordsPerPageOptions={PAGE_SIZES}
-				onRecordsPerPageChange={onRecordsPerPageChange}
-				sortStatus={sortStatus}
-				onSortStatusChange={onSortStatusChange}
+				maxHeight="300px"
+				rows={allocationsData}
+				rowKey={allocation => allocation.id}
+				onRowClick={(allocation, e) => {
+					const href = `/project/${id}/allocation/${allocation.id}`;
+					if (e.ctrlKey || e.metaKey || ('button' in e && e.button === 1)) window.open(href, '_blank');
+					else navigate(href);
+				}}
+				emptyTitle={t('components.project.allocations.index.no_records_text')}
+				sort={sort}
+				onSortChange={setSort}
+				pagination={{
+					page: metadata.page,
+					pageSize: metadata.recordsPerPage,
+					totalItems: metadata.totalRecords,
+					pageSizes: PAGE_SIZES,
+					onChange: ({ page: nextPage, pageSize }) => {
+						setPage(nextPage);
+						setLimit(pageSize);
+					}
+				}}
 				columns={[
 					{
-						accessor: 'name',
-						title: t('components.project.allocations.index.columns.resource_name'),
-						width: 200,
+						key: 'name',
+						header: t('components.project.allocations.index.columns.resource_name'),
+						width: '200px',
 						render: allocation => allocation.resource.name,
 						sortable: true
 					},
 					{
-						accessor: 'type',
-						title: t('components.project.allocations.index.columns.resource_type'),
-						width: 200,
+						key: 'type',
+						header: t('components.project.allocations.index.columns.resource_type'),
+						width: '200px',
 						render: allocation => allocation.resource.type,
 						sortable: true
 					},
 					{
-						accessor: 'user',
-						title: t('components.project.allocations.index.columns.user'),
+						key: 'user',
+						header: t('components.project.allocations.index.columns.user'),
 						render: allocation => (
 							<Stack>
 								{allocation.allocationUsers.map(user => (
@@ -133,9 +123,9 @@ const ProjectAllocationsTable = ({ id }: ProjectAllocationTableProps) => {
 						)
 					},
 					{
-						accessor: 'status',
-						title: t('components.project.allocations.index.columns.status'),
-						width: 150,
+						key: 'status',
+						header: t('components.project.allocations.index.columns.status'),
+						width: '150px',
 						sortable: true,
 						render: allocation => {
 							if (allocation.status === 'active') {
@@ -191,11 +181,11 @@ const ProjectAllocationsTable = ({ id }: ProjectAllocationTableProps) => {
 						}
 					},
 					{
-						accessor: 'endDate',
-						title: t('components.project.allocations.index.columns.end_date'),
+						key: 'endDate',
+						header: t('components.project.allocations.index.columns.end_date'),
 						render: allocation =>
 							allocation.endDate ? dayjs(allocation.endDate).format('DD.MM.YYYY') : 'None',
-						width: 150,
+						width: '150px',
 						sortable: true
 					}
 				]}

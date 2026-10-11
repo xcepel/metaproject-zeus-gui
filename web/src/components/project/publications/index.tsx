@@ -2,10 +2,10 @@ import { ActionIcon, Alert, Badge, Box, Group, Title, Tooltip } from '@mantine/c
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconLibrary, IconTrash, IconTrashX } from '@tabler/icons-react';
-import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
 import { HTTPError } from 'ky';
+import { DataTable, type DataTableColumn, type DataTableSort } from '@metacentrum/design-system';
 
 import AddPublication from '@/components/project/publications/add-publication';
 import ErrorAlert from '@/components/global/error-alert';
@@ -29,10 +29,7 @@ const ProjectPublications = ({ id }: ProjectPublicationsProps) => {
 	const [currentPublication, setCurrentPublication] = useState<number | null>(null);
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(PUBLICATION_PAGE_SIZES[0]);
-	const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Publication>>({
-		columnAccessor: 'id',
-		direction: 'asc'
-	});
+	const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 
 	const { mutate, isPending: isRemovePending } = useRemovePublicationMutation();
 	const deleteMyMutation = useDeleteMyPublicationMutation();
@@ -44,11 +41,7 @@ const ProjectPublications = ({ id }: ProjectPublicationsProps) => {
 		isError,
 		error,
 		refetch
-	} = useProjectPublicationsQuery(
-		id,
-		{ page, limit },
-		getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
-	);
+	} = useProjectPublicationsQuery(id, { page, limit }, getSortQuery(sort.key, sort.direction));
 
 	if (isPending) {
 		return <Loading />;
@@ -70,21 +63,6 @@ const ProjectPublications = ({ id }: ProjectPublicationsProps) => {
 
 	const metadata = response?.metadata;
 	const publications = response?.data ?? [];
-
-	const onPageChange = async (newPage: number) => {
-		setPage(newPage);
-		await refetch();
-	};
-
-	const onRecordsPerPageChange = async (newRecordsPerPage: number) => {
-		setLimit(newRecordsPerPage);
-		await refetch();
-	};
-
-	const onSortStatusChange = async (status: DataTableSortStatus<Publication>) => {
-		setSortStatus(status);
-		await refetch();
-	};
 
 	const removePublication = (publicationId?: number) => {
 		if (publicationId === undefined) {
@@ -162,6 +140,65 @@ const ProjectPublications = ({ id }: ProjectPublicationsProps) => {
 		});
 	};
 
+	const columns: DataTableColumn<Publication>[] = [
+		{
+			key: 'info',
+			header: t('components.project.publications.index.columns.publication_info'),
+			render: publication => <PublicationCard publication={publication} />
+		},
+		{
+			key: 'year',
+			header: t('components.project.publications.index.columns.year'),
+			width: '150px',
+			sortable: true
+		}
+	];
+
+	if (permissions.includes('edit_publications')) {
+		columns.push({
+			key: 'actions',
+			header: t('components.project.publications.index.columns.actions'),
+			width: '160px',
+			render: (publication: Publication) => (
+				<Group gap={4} justify="space-between" wrap="nowrap">
+					<Tooltip
+						label={t('components.project.publications.index.tooltips.remove', {
+							defaultValue: 'Remove from project'
+						})}
+						withArrow
+					>
+						<ActionIcon
+							size="sm"
+							variant="subtle"
+							color="red"
+							loading={isRemovePending && currentPublication === publication.id}
+							onClick={() => removePublication(publication?.id)}
+						>
+							<IconTrash size={24} />
+						</ActionIcon>
+					</Tooltip>
+					{publication.isOwner && (
+						<Tooltip
+							label={t('components.project.publications.index.tooltips.remove_and_delete', {
+								defaultValue: 'Remove and delete from My publications'
+							})}
+							withArrow
+						>
+							<ActionIcon
+								size="sm"
+								variant="subtle"
+								color="red"
+								onClick={() => removeAndDelete(publication?.id)}
+							>
+								<IconTrashX size={24} />
+							</ActionIcon>
+						</Tooltip>
+					)}
+				</Group>
+			)
+		});
+	}
+
 	return (
 		<Box mt={30}>
 			<Group justify="space-between" mb={5}>
@@ -176,81 +213,26 @@ const ProjectPublications = ({ id }: ProjectPublicationsProps) => {
 				{permissions.includes('edit_publications') && <AddPublication id={id} />}
 			</Group>
 			<DataTable
-				height={300}
-				withTableBorder
-				textSelectionDisabled
-				page={page}
-				totalRecords={metadata?.totalRecords}
-				recordsPerPage={limit}
-				fetching={isPending}
-				records={publications}
-				noRecordsText={t('components.project.publications.index.no_records_text')}
-				onPageChange={onPageChange}
-				recordsPerPageOptions={PUBLICATION_PAGE_SIZES}
-				onRecordsPerPageChange={onRecordsPerPageChange}
-				sortStatus={sortStatus}
-				onSortStatusChange={onSortStatusChange}
-				columns={[
-					{
-						title: t('components.project.publications.index.columns.publication_info'),
-						accessor: 'info',
-						render: (publication: Publication) => <PublicationCard publication={publication} />
-					},
-					{
-						accessor: 'year',
-						title: t('components.project.publications.index.columns.year'),
-						width: 150,
-						sortable: true
-					},
-					{
-						accessor: 'actions',
-						title: t('components.project.publications.index.columns.actions'),
-						textAlign: 'center',
-						width: 160,
-						hidden: !permissions.includes('edit_publications'),
-						render: (publication: Publication) => (
-							<Group gap={4} justify="space-between" wrap="nowrap">
-								<Tooltip
-									label={t('components.project.publications.index.tooltips.remove', {
-										defaultValue: 'Remove from project'
-									})}
-									withArrow
-								>
-									<ActionIcon
-										size="sm"
-										variant="subtle"
-										color="red"
-										loading={isRemovePending && currentPublication === publication.id}
-										onClick={() => removePublication(publication?.id)}
-									>
-										<IconTrash size={24} />
-									</ActionIcon>
-								</Tooltip>
-								{publication.isOwner && (
-									<Tooltip
-										label={t('components.project.publications.index.tooltips.remove_and_delete', {
-											defaultValue: 'Remove and delete from My publications'
-										})}
-										withArrow
-									>
-										<ActionIcon
-											size="sm"
-											variant="subtle"
-											color="red"
-											onClick={() => removeAndDelete(publication?.id)}
-										>
-											<IconTrashX size={24} />
-										</ActionIcon>
-									</Tooltip>
-								)}
-							</Group>
-						)
+				maxHeight="300px"
+				rows={publications}
+				rowKey={publication => publication.id ?? publication.uniqueId ?? publication.title}
+				emptyTitle={t('components.project.publications.index.no_records_text')}
+				sort={sort}
+				onSortChange={setSort}
+				pagination={{
+					page,
+					pageSize: limit,
+					totalItems: metadata?.totalRecords ?? 0,
+					pageSizes: PUBLICATION_PAGE_SIZES,
+					onChange: ({ page: nextPage, pageSize }) => {
+						setPage(nextPage);
+						setLimit(pageSize);
 					}
-				]}
+				}}
+				columns={columns}
 			/>
 		</Box>
 	);
 };
 
 export default ProjectPublications;
-

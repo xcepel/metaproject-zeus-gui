@@ -1,5 +1,4 @@
 import { Box, Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core';
-import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,7 +6,7 @@ import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
 import { IconLibrary } from '@tabler/icons-react';
 import { HTTPError } from 'ky';
-import { PageHeader } from '@metacentrum/design-system';
+import { DataTable, type DataTableSort, PageHeader } from '@metacentrum/design-system';
 
 import RouterLink from '@/components/global/router-link';
 import { PUBLICATION_PAGE_SIZES } from '@/modules/publication/constants';
@@ -29,8 +28,8 @@ import { useMyActiveProjectsQuery } from '@/modules/project/queries';
 const MyPublicationsPage = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(PUBLICATION_PAGE_SIZES[0]);
-    const [sort, setSort] = useState<DataTableSortStatus<Publication>>({ columnAccessor: 'id', direction: 'asc' });
-    const sortQuery = useMemo(() => getSortQuery(sort.columnAccessor, sort.direction), [sort]);
+    const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
+    const sortQuery = useMemo(() => getSortQuery(sort.key, sort.direction), [sort]);
 
     const { data, isPending, refetch } = useMyPublicationsQuery({ page, limit }, sortQuery);
     // Fetch all active projects for dropdown selection
@@ -277,25 +276,29 @@ const MyPublicationsPage = () => {
                 }
             />
             <DataTable
-                height={500}
-                withTableBorder
-                fetching={isPending}
-                records={data?.data ?? []}
-                totalRecords={data?.metadata?.totalRecords}
-                page={page}
-                onPageChange={async (p: number) => { setPage(p); await refetch(); }}
-                recordsPerPage={limit}
-                recordsPerPageOptions={PUBLICATION_PAGE_SIZES}
-                onRecordsPerPageChange={async (l: number) => { setLimit(l); await refetch(); }}
-                sortStatus={sort}
-                onSortStatusChange={async (s: DataTableSortStatus<Publication>) => { setSort(s); await refetch(); }}
+                maxHeight="500px"
+                loading={isPending}
+                rows={data?.data ?? []}
+                rowKey={(pub: Publication) => pub.id ?? pub.uniqueId ?? pub.title}
+                pagination={{
+                    page,
+                    pageSize: limit,
+                    totalItems: data?.metadata?.totalRecords ?? 0,
+                    pageSizes: PUBLICATION_PAGE_SIZES,
+                    onChange: ({ page: nextPage, pageSize }) => {
+                        setPage(nextPage);
+                        setLimit(pageSize);
+                    }
+                }}
+                sort={sort}
+                onSortChange={setSort}
                 columns={[
-                    { accessor: 'title', title: 'Title' },
-                    { accessor: 'authors', title: 'Authors' },
-                    { accessor: 'journal', title: 'Journal' },
-                    { accessor: 'year', title: 'Year', width: 120 },
+                    { key: 'title', header: 'Title' },
+                    { key: 'authors', header: 'Authors' },
+                    { key: 'journal', header: 'Journal' },
+                    { key: 'year', header: 'Year', width: '120px' },
                     {
-                        accessor: 'actions', title: '', width: 220, textAlign: 'right',
+                        key: 'actions', header: '', width: '220px', align: 'end',
                         render: (pub: Publication) => (
                             <Group gap={8} justify="flex-end">
                                 <Button size="xs" variant="light" onClick={() => openAssignModal(pub)}>Assign to project</Button>

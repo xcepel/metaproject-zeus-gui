@@ -1,5 +1,4 @@
-import { ActionIcon, Box, Button, Divider, Group, NumberInput, Stack, TextInput, Title } from '@mantine/core';
-import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
+import { ActionIcon, Box, Button, Checkbox, Divider, Group, NumberInput, Stack, TextInput, Title } from '@mantine/core';
 import { IconClipboardPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
@@ -10,6 +9,7 @@ import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { HTTPError } from 'ky';
+import { DataTable, type DataTableSort } from '@metacentrum/design-system';
 
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
 import { useProjectOutletContext } from '@/modules/auth/guards/project-detail-guard';
@@ -52,12 +52,9 @@ const ProjectPublicationsAddPage = () => {
 	const [isMyModalOpen, setIsMyModalOpen] = useState(false);
 	const [myPage, setMyPage] = useState(1);
 	const [myLimit, setMyLimit] = useState(PUBLICATION_PAGE_SIZES[0]);
-	const [mySort, setMySort] = useState<DataTableSortStatus<Publication>>({
-		columnAccessor: 'id',
-		direction: 'asc'
-	});
+	const [mySort, setMySort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 	const mySortQuery = useMemo(
-		() => getSortQuery(mySort.columnAccessor, mySort.direction),
+		() => getSortQuery(mySort.key, mySort.direction),
 		[mySort]
 	);
 	const {
@@ -68,6 +65,22 @@ const ProjectPublicationsAddPage = () => {
 	const myRecords = myResponse?.data ?? [];
 	const myTotal = myResponse?.metadata?.totalRecords ?? 0;
 	const [selectedMy, setSelectedMy] = useState<Publication[]>([]);
+	// DataTable has no row selection, so selection is a checkbox column (matched by id).
+	const isMySelected = (publication: Publication) => selectedMy.some(selected => selected.id === publication.id);
+	const toggleMySelected = (publication: Publication) =>
+		setSelectedMy(selected =>
+			selected.some(item => item.id === publication.id)
+				? selected.filter(item => item.id !== publication.id)
+				: [...selected, publication]
+		);
+	const allMySelected = myRecords.length > 0 && myRecords.every(isMySelected);
+	const someMySelected = myRecords.some(isMySelected);
+	const toggleAllMySelected = () =>
+		setSelectedMy(selected =>
+			allMySelected
+				? selected.filter(item => !myRecords.some(record => record.id === item.id))
+				: [...selected, ...myRecords.filter(record => !selected.some(item => item.id === record.id))]
+		);
 
 	const handleSelect = (pickedPublication: Publication) => {
 		// publication is picked - remove
@@ -285,28 +298,26 @@ const ProjectPublicationsAddPage = () => {
 				<Box py={30}>
 					<Title order={4}>{t('routes.ProjectPublicationsAddPage.table.title')}</Title>
 					<DataTable
-						height={500}
-						withTableBorder
-						striped
-						records={publications}
+						maxHeight="500px"
+						rows={publications}
+						rowKey={publication => publication.uniqueId ?? publication.id ?? publication.title}
 						columns={[
 							{
-								accessor: 'title',
-								title: t('components.project.publications.index.columns.publication_info'),
+								key: 'title',
+								header: t('components.project.publications.index.columns.publication_info'),
 								render: (publication: Publication) => (
 									<PublicationCard publication={publication} />
 								)
 							},
 							{
-								accessor: 'year',
-								title: t('components.project.publications.index.columns.year'),
-								width: 150
+								key: 'year',
+								header: t('components.project.publications.index.columns.year'),
+								width: '150px'
 							},
 							{
-								accessor: 'actions',
-								title: '',
-								textAlign: 'center',
-								width: 120,
+								key: 'actions',
+								header: '',
+								width: '120px',
 								render: (userInfo: Publication) => (
 									<Group gap={4} justify="space-between" wrap="nowrap">
 										<ActionIcon
@@ -334,32 +345,44 @@ const ProjectPublicationsAddPage = () => {
 				<Box py={30}>
 					<Title order={4}>{t('routes.ProjectPublicationsAddPage.my.title', { defaultValue: 'My publications' })}</Title>
 					<DataTable
-						height={500}
-						withTableBorder
-						fetching={isMyLoading}
-						records={myRecords}
-						totalRecords={myTotal}
-						page={myPage}
-						onPageChange={async p => {
-							setMyPage(p);
-							await refetchMy();
+						maxHeight="500px"
+						loading={isMyLoading}
+						rows={myRecords}
+						rowKey={publication => publication.id ?? publication.uniqueId ?? publication.title}
+						pagination={{
+							page: myPage,
+							pageSize: myLimit,
+							totalItems: myTotal,
+							pageSizes: PUBLICATION_PAGE_SIZES,
+							onChange: ({ page, pageSize }) => {
+								setMyPage(page);
+								setMyLimit(pageSize);
+							}
 						}}
-						recordsPerPage={myLimit}
-						recordsPerPageOptions={PUBLICATION_PAGE_SIZES}
-						onRecordsPerPageChange={async l => {
-							setMyLimit(l);
-							await refetchMy();
-						}}
-						selectedRecords={selectedMy}
-						onSelectedRecordsChange={setSelectedMy}
-						sortStatus={mySort}
-						onSortStatusChange={async s => {
-							setMySort(s as DataTableSortStatus<Publication>);
-							await refetchMy();
-						}}
+						sort={mySort}
+						onSortChange={setMySort}
 						columns={[
-							{ accessor: 'title', title: t('components.project.publications.index.columns.publication_info') },
-							{ accessor: 'year', title: t('components.project.publications.index.columns.year'), width: 150 }
+							{
+								key: 'select',
+								header: (
+									<Checkbox
+										aria-label="Select all"
+										checked={allMySelected}
+										indeterminate={someMySelected && !allMySelected}
+										onChange={toggleAllMySelected}
+									/>
+								),
+								width: '48px',
+								render: publication => (
+									<Checkbox
+										aria-label={publication.title}
+										checked={isMySelected(publication)}
+										onChange={() => toggleMySelected(publication)}
+									/>
+								)
+							},
+							{ key: 'title', header: t('components.project.publications.index.columns.publication_info') },
+							{ key: 'year', header: t('components.project.publications.index.columns.year'), width: '150px' }
 						]}
 					/>
 					<Group mt={10} justify="flex-end">

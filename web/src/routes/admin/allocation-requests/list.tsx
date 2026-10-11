@@ -1,5 +1,5 @@
 import { Box, SegmentedControl, Stack, Title } from '@mantine/core';
-import type { DataTableSortStatus } from 'mantine-datatable';
+import type { DataTableSort } from '@metacentrum/design-system';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -48,13 +48,13 @@ const AllocationRequestsList = () => {
 				/>
 				{filter === 'new-requests' && (
 					<AllocationAdminTable
-						useAllocationQuery={(page: number, limit: number, sortStatus: DataTableSortStatus<AllocationAdmin>) =>
+						useAllocationQuery={(page: number, limit: number, sort: DataTableSort) =>
 							useAllocationsRequestsQuery(
 								{
 									page,
 									limit
 								},
-								getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
+								getSortQuery(sort.key, sort.direction)
 							)
 						}
 						buildLink={(allocation: AllocationAdmin) => `${prefix}/allocations/${allocation.id}`}
@@ -62,13 +62,13 @@ const AllocationRequestsList = () => {
 				)}
 				{filter === 'pending-modifications' && (
 					<AllocationAdminTable
-						useAllocationQuery={(page: number, limit: number, sortStatus: DataTableSortStatus<AllocationAdmin>) =>
+						useAllocationQuery={(page: number, limit: number, sort: DataTableSort) =>
 							usePendingModificationsQuery(
 								{
 									page,
 									limit
 								},
-								getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
+								getSortQuery(sort.key, sort.direction)
 							)
 						}
 						buildLink={(allocation: AllocationAdmin) => `${prefix}/allocations/${allocation.id}`}

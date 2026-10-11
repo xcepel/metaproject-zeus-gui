@@ -1,9 +1,9 @@
 import { ActionIcon, Badge, Box, Group, Text, Title } from '@mantine/core';
-import { DataTable, type DataTableSortStatus } from 'mantine-datatable';
 import { IconCheck, IconClock, IconForbid, IconTrash, IconUser, IconUsers, IconUserUp } from '@tabler/icons-react';
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
+import { DataTable, type DataTableSort } from '@metacentrum/design-system';
 
 import { useProjectMembersQuery } from '@/modules/project/queries';
 import ErrorAlert from '@/components/global/error-alert';
@@ -24,10 +24,7 @@ const ProjectMembers = ({ id }: ProjectMembersProps) => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(PAGE_SIZES[0]);
 	const [currentMember, setCurrentMember] = useState<number | null>(null);
-	const [sortStatus, setSortStatus] = useState<DataTableSortStatus<ProjectMember>>({
-		columnAccessor: 'id',
-		direction: 'asc'
-	});
+	const [sort, setSort] = useState<DataTableSort>({ key: 'id', direction: 'asc' });
 
 	const { permissions } = useProjectOutletContext();
 	const { mutate, isPending: isRemovePending } = useRemoveProjectMemberMutation();
@@ -42,7 +39,7 @@ const ProjectMembers = ({ id }: ProjectMembersProps) => {
 			page,
 			limit
 		},
-		getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
+		getSortQuery(sort.key, sort.direction)
 	);
 
 	if (isPending || !response) {
@@ -55,21 +52,6 @@ const ProjectMembers = ({ id }: ProjectMembersProps) => {
 
 	const metadata = response.metadata ?? { totalRecords: 0, currentPage: 1 };
 	const members = response.data ?? [];
-
-	const onPageChange = async (newPage: number) => {
-		setPage(newPage);
-		await refetch();
-	};
-
-	const onRecordsPerPageChange = async (newRecordsPerPage: number) => {
-		setLimit(newRecordsPerPage);
-		await refetch();
-	};
-
-	const onSortStatusChange = async (sortStatus: DataTableSortStatus<ProjectMember>) => {
-		setSortStatus(sortStatus);
-		await refetch();
-	};
 
 	const removeUser = (memberId: number) => {
 		setCurrentMember(memberId);
@@ -108,41 +90,44 @@ const ProjectMembers = ({ id }: ProjectMembersProps) => {
 				{permissions.includes('edit_members') && <AddButton id={id} />}
 			</Group>
 			<DataTable
-				height={300}
-				withTableBorder
-				fetching={isPending}
-				page={page}
-				totalRecords={metadata?.totalRecords ?? 0}
-				recordsPerPage={limit}
-				records={members}
-				noRecordsText={t('components.project.members.index.no_records_text')}
-				onPageChange={onPageChange}
-				recordsPerPageOptions={PAGE_SIZES}
-				onRecordsPerPageChange={onRecordsPerPageChange}
-				sortStatus={sortStatus}
-				onSortStatusChange={onSortStatusChange}
+				maxHeight="300px"
+				rows={members}
+				rowKey={member => member.id}
+				emptyTitle={t('components.project.members.index.no_records_text')}
+				sort={sort}
+				onSortChange={setSort}
+				pagination={{
+					page,
+					pageSize: limit,
+					totalItems: metadata?.totalRecords ?? 0,
+					pageSizes: PAGE_SIZES,
+					onChange: ({ page: nextPage, pageSize }) => {
+						setPage(nextPage);
+						setLimit(pageSize);
+					}
+				}}
 				columns={[
 					{
-						accessor: 'id',
-						title: t('components.project.members.index.columns.id'),
-						width: 150,
+						key: 'id',
+						header: t('components.project.members.index.columns.id'),
+						width: '150px',
 						sortable: true
 					},
 					{
-						accessor: 'name',
-						title: t('components.project.members.index.columns.name'),
+						key: 'name',
+						header: t('components.project.members.index.columns.name'),
 						render: member => member.userInfo.name,
 						sortable: true
 					},
 					{
-						accessor: 'email',
-						title: t('components.project.members.index.columns.email'),
+						key: 'email',
+						header: t('components.project.members.index.columns.email'),
 						render: member => member.userInfo.email,
 						sortable: true
 					},
 					{
-						accessor: 'role',
-						title: t('components.project.members.index.columns.role.title'),
+						key: 'role',
+						header: t('components.project.members.index.columns.role.title'),
 						render: member => {
 							if (member.role === 'manager') {
 								return (
@@ -161,8 +146,8 @@ const ProjectMembers = ({ id }: ProjectMembersProps) => {
 						}
 					},
 					{
-						accessor: 'status',
-						title: t('components.project.members.index.columns.status'),
+						key: 'status',
+						header: t('components.project.members.index.columns.status'),
 						sortable: true,
 						render: member => {
 							if (member.status === 'active') {
@@ -189,27 +174,29 @@ const ProjectMembers = ({ id }: ProjectMembersProps) => {
 							);
 						}
 					},
-					{
-						accessor: 'actions',
-						title: t('components.project.members.index.columns.actions'),
-						textAlign: 'center',
-						hidden: !permissions.includes('edit_members'),
-						width: 120,
-						render: member => (
-							<Group gap={4} justify="space-between" wrap="nowrap">
-								<ActionIcon
-									size="sm"
-									variant="subtle"
-									color="red"
-									disabled={member.status === 'removed'}
-									loading={isRemovePending && currentMember === member.id}
-									onClick={() => removeUser(member.id)}
-								>
-									<IconTrash size={24} />
-								</ActionIcon>
-							</Group>
-						)
-					}
+					...(permissions.includes('edit_members')
+						? [
+								{
+									key: 'actions',
+									header: t('components.project.members.index.columns.actions'),
+									width: '120px',
+									render: (member: ProjectMember) => (
+										<Group gap={4} justify="space-between" wrap="nowrap">
+											<ActionIcon
+												size="sm"
+												variant="subtle"
+												color="red"
+												disabled={member.status === 'removed'}
+												loading={isRemovePending && currentMember === member.id}
+												onClick={() => removeUser(member.id)}
+											>
+												<IconTrash size={24} />
+											</ActionIcon>
+										</Group>
+									)
+								}
+							]
+						: [])
 				]}
 			/>
 		</Box>

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Box, Title } from '@mantine/core';
-import type { DataTableSortStatus } from 'mantine-datatable';
+import type { DataTableSort } from '@metacentrum/design-system';
 import React from 'react';
 
 import PageBreadcrumbs from '@/components/global/page-breadcrumbs';
@@ -26,13 +26,13 @@ const AllProjects = () => {
 			/>
 			<Title order={2}>{t('routes.AllProjects.title')}</Title>
 			<ProjectAdminTable
-				useProjectQuery={(page: number, limit: number, sortStatus: DataTableSortStatus<Project>) =>
+				useProjectQuery={(page: number, limit: number, sort: DataTableSort) =>
 					useAllProjectsQuery(
 						{
 							page,
 							limit
 						},
-						getSortQuery(sortStatus.columnAccessor, sortStatus.direction)
+						getSortQuery(sort.key, sort.direction)
 					)
 				}
 				buildLink={(project: Project) => `/project/${project.id}`}

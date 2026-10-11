@@ -1,11 +1,11 @@
 import { ActionIcon, Box, Button, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
-import { DataTable } from 'mantine-datatable';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { DataTable } from '@metacentrum/design-system';
 
 import { useAddProjectMemberMutation } from '@/modules/project/mutations';
 import { addMembersSchema, addSingleMemberSchema, type AddSingleMemberSchema } from '@/modules/project/form';
@@ -113,20 +113,19 @@ const ProjectDetailMembers = () => {
 				<Box mt={30}>
 					<Title order={4}>Picked members</Title>
 					<DataTable
-						height={500}
-						withTableBorder
-						striped
-						records={pickedMembers}
+						maxHeight="500px"
+						rows={pickedMembers}
+						rowKey={member => member.email}
 						columns={[
 							{
-								accessor: 'email',
-								title: 'E-mail',
+								key: 'email',
+								header: 'E-mail',
 								render: userInfo => userInfo.email
 							},
 							{
-								accessor: 'role',
-								title: 'Role',
-								width: 200,
+								key: 'role',
+								header: 'Role',
+								width: '200px',
 								render: userInfo => {
 									if (permissions.includes('edit_managers')) {
 										return (
@@ -148,10 +147,9 @@ const ProjectDetailMembers = () => {
 								}
 							},
 							{
-								accessor: 'actions',
-								title: '',
-								textAlign: 'center',
-								width: 120,
+								key: 'actions',
+								header: '',
+								width: '120px',
 								render: userInfo => (
 									<Group gap={4} justify="space-between" wrap="nowrap">
 										<ActionIcon

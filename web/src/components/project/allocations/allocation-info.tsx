@@ -1,6 +1,5 @@
 import { Anchor, Box, Button, Divider, Flex, Group, Select, Stack, Text, Textarea, Title } from '@mantine/core';
 import dayjs from 'dayjs';
-import { DataTable } from 'mantine-datatable';
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Controller, type ControllerRenderProps, useForm } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { HTTPError } from 'ky';
+import { DataTable } from '@metacentrum/design-system';
 
 import { type AllocationDetail } from '@/modules/allocation/model';
 import { getCurrentRole } from '@/modules/auth/methods/getCurrentRole';
@@ -302,21 +302,21 @@ const AllocationInfo = ({ allocation, isApprovePage, onSuccess }: AllocationInfo
 			<Stack mt={20}>
 				<Title order={2}>Users in allocation</Title>
 				<DataTable
-					records={allocation.allocationUsers}
-					textSelectionDisabled
+					rows={allocation.allocationUsers}
+					rowKey={user => user.id}
 					columns={[
 						{
-							accessor: 'id',
-							title: 'ID',
-							width: 70
+							key: 'id',
+							header: 'ID',
+							width: '70px'
 						},
 						{
-							accessor: 'name',
-							title: 'Name'
+							key: 'name',
+							header: 'Name'
 						},
 						{
-							accessor: 'email',
-							title: 'E-mail'
+							key: 'email',
+							header: 'E-mail'
 						}
 					]}
 				/>
