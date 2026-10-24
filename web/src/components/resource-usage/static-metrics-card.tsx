@@ -1,4 +1,5 @@
 import { Paper, Group, Stack, Text, Select } from '@mantine/core';
+import { Card } from '@metacentrum/design-system';
 import { IconCpu, IconDatabase } from '@tabler/icons-react';
 import { useState, useMemo } from 'react';
 import { 
@@ -24,7 +25,7 @@ export const StaticMetricsCard = ({ totalVcpus, storageBytesAllocated, lastUpdat
 	const [selectedStorageUnit, setSelectedStorageUnit] = useState<MemoryUnit>(autoStorageUnit);
 	
 	return (
-		<Paper withBorder p="md" radius="md">
+		<Card>
 			<Stack gap="md">
 				<Text fw={600}>Static Allocations</Text>
 				
@@ -73,7 +74,7 @@ export const StaticMetricsCard = ({ totalVcpus, storageBytesAllocated, lastUpdat
 					Last updated: {new Date(lastUpdated).toLocaleString()}
 				</Text>
 			</Stack>
-		</Paper>
+		</Card>
 	);
 };
 

@@ -1,4 +1,4 @@
-import { Box, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core';
+import { Box, Group, Modal, Stack, Text } from '@mantine/core';
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -6,7 +6,7 @@ import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
 import { IconLibrary } from '@tabler/icons-react';
 import { HTTPError } from 'ky';
-import { Button, DataTable, type DataTableSort, PageHeader } from '@metacentrum/design-system';
+import { Button, DataTable, type DataTableSort, NumberInput, PageHeader, Select, TextInput } from '@metacentrum/design-system';
 
 import RouterLink from '@/components/global/router-link';
 import { PUBLICATION_PAGE_SIZES } from '@/modules/publication/constants';
@@ -187,25 +187,29 @@ const MyPublicationsPage = () => {
     return (
         <Box>
             <Modal opened={isAddModalOpen} onClose={closeAddModal} title="Add publication" centered size="xl">
-                <form onSubmit={handleAddManualSubmit}>
-                    <TextInput label="Title" {...addForm.register('title')} error={addForm.formState.errors.title?.message} withAsterisk />
-                    <TextInput label="Authors" {...addForm.register('authors')} error={addForm.formState.errors.authors?.message} withAsterisk />
+                {/* noValidate: required only marks the label here (Mantine withAsterisk); zod validates */}
+                <form onSubmit={handleAddManualSubmit} noValidate>
+                    <TextInput label="Title" {...addForm.register('title')} error={addForm.formState.errors.title?.message} required />
+                    <TextInput label="Authors" {...addForm.register('authors')} error={addForm.formState.errors.authors?.message} required />
                     <Controller
                         control={addForm.control}
                         name="year"
-                        render={({ field }: { field: { value: number | undefined; onChange: (value: number | string | null) => void } }) => (
+                        render={({ field }) => (
                             <NumberInput
+                                ref={field.ref}
+                                name={field.name}
                                 label="Year"
                                 min={0}
                                 max={2200}
-                                value={field.value}
-                                onChange={(value: string | number) => field.onChange(typeof value === 'number' ? value : null)}
+                                value={field.value ?? ''}
+                                onChange={(value) => field.onChange(value === '' ? null : value)}
+                                onBlur={field.onBlur}
                                 error={addForm.formState.errors.year?.message}
-                                withAsterisk
+                                required
                             />
                         )}
                     />
-                    <TextInput label="Journal" {...addForm.register('journal')} error={addForm.formState.errors.journal?.message} withAsterisk />
+                    <TextInput label="Journal" {...addForm.register('journal')} error={addForm.formState.errors.journal?.message} required />
                     <Group mt={15} justify="flex-end">
                         <Button variant="secondary" type="button" onClick={closeAddModal}>Cancel</Button>
                         <Button variant="primary" type="submit" loading={addForm.formState.isSubmitting}>Add publication</Button>
@@ -246,7 +250,6 @@ const MyPublicationsPage = () => {
                                 onChange={setAssignProjectId}
                                 disabled={assignMutation.isPending || isProjectsPending}
                                 searchable
-                                nothingFoundMessage="No projects found"
                                 description="Only active projects you are a member of are shown"
                             />
                         )}

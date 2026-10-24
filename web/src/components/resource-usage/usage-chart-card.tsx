@@ -1,4 +1,5 @@
-import { Paper, Stack, Group, Text, Badge, useMantineTheme, Select } from '@mantine/core';
+import { Stack, Group, Text, Badge, useMantineTheme, Select } from '@mantine/core';
+import { Card } from '@metacentrum/design-system';
 import { useMemo, useState } from 'react';
 import { ResourceUsageSeriesPoint } from '@/modules/resource-usage/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -127,7 +128,7 @@ export const UsageChartCard = ({ title, description, series, metrics, unitType =
 	}, [aggregatedSeries, metrics, selectedTimeUnit, selectedMemoryUnit, unitType]);
 
 	return (
-		<Paper withBorder p="md" radius="md">
+		<Card>
 			<Stack gap="xs">
 				<Group justify="space-between">
 					<div>
@@ -230,7 +231,7 @@ export const UsageChartCard = ({ title, description, series, metrics, unitType =
 					})}
 				</Group>
 			</Stack>
-		</Paper>
+		</Card>
 	);
 };
 

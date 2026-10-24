@@ -1,4 +1,5 @@
-import { Paper, Stack, Text, Group, ThemeIcon } from '@mantine/core';
+import { Stack, Text, Group, ThemeIcon } from '@mantine/core';
+import { Card } from '@metacentrum/design-system';
 import { ReactNode } from 'react';
 
 interface UsageStatCardProps {
@@ -9,7 +10,7 @@ interface UsageStatCardProps {
 }
 
 export const UsageStatCard = ({ title, value, description, icon }: UsageStatCardProps) => (
-	<Paper withBorder p="md" radius="md">
+	<Card>
 		<Group align="flex-start" gap="md">
 			{icon && (
 				<ThemeIcon size="lg" variant="light" color="blue">
@@ -30,7 +31,7 @@ export const UsageStatCard = ({ title, value, description, icon }: UsageStatCard
 				)}
 			</Stack>
 		</Group>
-	</Paper>
+	</Card>
 );
 
 export default UsageStatCard;

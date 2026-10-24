@@ -1,8 +1,8 @@
-import { Accordion, Badge, Card, Group, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
+import { Accordion, Badge, Group, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconCheck, IconClock, IconGitMerge, IconGitPullRequest, IconX, IconEdit } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
-import { Button } from '@metacentrum/design-system';
+import { Button, Card } from '@metacentrum/design-system';
 
 import { type AllocationDetail, type OpenstackRequest, type OpenstackRequestStatus, type MergeRequestState } from '@/modules/allocation/model';
 import OpenstackModifyModal from './openstack-modify-modal';
@@ -278,36 +278,37 @@ const OpenstackAllocationInfo = ({ data, history, canModify, allocationId, isCha
 
 	return (
 		<>
-			<Card withBorder radius="md" padding="md" mt="md">
-				<Stack gap="md">
-					<Group justify="space-between">
-						<Title order={4}>OpenStack Details</Title>
-						<Group gap="xs">
-							<Badge color={statusConfig.color} variant="light">
-								{statusConfig.label}
+			<Card
+				title="OpenStack Details"
+				actions={
+					<Group gap="xs">
+						<Badge color={statusConfig.color} variant="light">
+							{statusConfig.label}
+						</Badge>
+						{mrStateConfig && (
+							<Badge
+								color={mrStateConfig.color}
+								variant="light"
+								leftSection={mrStateConfig.icon}
+							>
+								MR: {mrStateConfig.label}
 							</Badge>
-							{mrStateConfig && (
-								<Badge
-									color={mrStateConfig.color}
-									variant="light"
-									leftSection={mrStateConfig.icon}
-								>
-									MR: {mrStateConfig.label}
-								</Badge>
-							)}
-							{data.processed && (
-								<Badge color="green" leftSection={<ThemeIcon color="green" size="sm" variant="light" radius="xl"><IconCheck size={14} /></ThemeIcon>}>
-									Processed
-								</Badge>
-							)}
-							{!data.processed && data.status === 'pending' && (
-								<Badge color="yellow" leftSection={<ThemeIcon color="yellow" size="sm" variant="light" radius="xl"><IconClock size={14} /></ThemeIcon>}>
-									Awaiting Approval
-								</Badge>
-							)}
-						</Group>
+						)}
+						{data.processed && (
+							<Badge color="green" leftSection={<ThemeIcon color="green" size="sm" variant="light" radius="xl"><IconCheck size={14} /></ThemeIcon>}>
+								Processed
+							</Badge>
+						)}
+						{!data.processed && data.status === 'pending' && (
+							<Badge color="yellow" leftSection={<ThemeIcon color="yellow" size="sm" variant="light" radius="xl"><IconClock size={14} /></ThemeIcon>}>
+								Awaiting Approval
+							</Badge>
+						)}
 					</Group>
-
+				}
+				style={{ marginTop: 'var(--mantine-spacing-md)' }}
+			>
+				<Stack gap="md">
 					<OpenstackRequestDetails request={data} />
 
 					{maxCpuTime && (
@@ -356,7 +357,7 @@ const OpenstackAllocationInfo = ({ data, history, canModify, allocationId, isCha
 						<Accordion.Panel>
 							<Stack gap="lg">
 								{history.map((request, index) => (
-									<Card key={request.id} withBorder radius="sm" padding="sm">
+									<Card key={request.id}>
 										<Text size="sm" fw={500} mb="xs">
 											Request #{request.id} - {formatDate(request.createdAt)}
 										</Text>
